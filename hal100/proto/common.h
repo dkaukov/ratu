@@ -22,6 +22,11 @@ enum {
 	channelC, channelL
 };
 
+enum {
+	cmdCalibrate,
+	cmdSetPos
+};
+
 typedef struct PROTO_PosParams {
 	long lPos;
 	long cPos;

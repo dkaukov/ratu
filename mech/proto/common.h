@@ -22,6 +22,11 @@ enum {
 	channelC, channelL
 };
 
+enum {
+	cmdCalibrate,
+	cmdSetPos
+};
+
 typedef struct PROTO_PosParams {
 	long lPos;
 	long cPos;
@@ -60,8 +65,6 @@ inline void busLoop() {
 	bus.receive();
 	bus.update();
 }
-
-
 
 
 #endif /* PROTO_COMMON_H_ */

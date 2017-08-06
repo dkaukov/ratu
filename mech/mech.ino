@@ -51,6 +51,22 @@ void OnArduinoReady()
 }
 
 void busReceiver(const TCommand *payload, const PJON_Packet_Info &packet_info) {
+	switch (payload->id) {
+	case cmdCalibrate:
+		switch (payload->cal.channel) {
+		case channelC:
+			calibrate2();
+			break;
+		case channelL:
+			calibrate1();
+			break;
+		}
+		break;
+	case cmdSetPos:
+		stepper1.moveTo(payload->pos.lPos);
+		stepper2.moveTo(payload->pos.cPos);
+		break;
+	}
 }
 
 void setup()
@@ -122,6 +138,7 @@ void set2() {
 
 
 void loop() {
+  busLoop();
   // Process incoming serial data, and perform callbacks
   cmdMessenger.feedinSerialData();
   stepper1.run();
