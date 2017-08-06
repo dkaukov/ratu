@@ -19,11 +19,12 @@
   http://www.arduino.cc/en/Tutorial/TFTDisplayText
 
 */
-
+#include "proto/device_id.h"
 #include <TFT.h>    // Arduino LCD library
 #include <SPI.h>    // SPI library
 #include <Keypad.h> // Keypad library
 #include <math.h>   // Math library
+#define PJON_ID ID_HAL100
 #include "proto/common.h"
 
 // TFT display CS, RS and RST pins definition for Mega2560

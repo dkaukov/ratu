@@ -2,9 +2,11 @@
 // Motor 2 = Ch2 = set 2 = Stepper 2 = "C" Motor
 // Motor C: 200 steps 360 degrees revolution (no gear). In quater-step mode 800 steps 360 degrees revolution (no gear). 
 // Measured 2964 steps 360 degrees revolution.
-
+#include "proto/device_id.h"
 #include <AccelStepper.h>   // Accel Stepper library
 #include <CmdMessenger.h>   // CmdMessenger library
+
+#define PJON_ID ID_MECH
 #include "proto/common.h"
 
 AccelStepper stepper1 = AccelStepper(1, 3, 4);  // Custom pinout "L" - Step to D3, Dir to D4 (Default AccelStepper::FULL4WIRE (4 pins) on 2, 3, 4, 5)

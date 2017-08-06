@@ -3,6 +3,9 @@
  *
  *  Created on: 6Aug.,2017
  *      Author: ziss
+ *
+ *
+ *
  */
 
 #ifndef PROTO_COMMON_H_
@@ -16,7 +19,7 @@
 
 #include <PJON.h>
 
-PJON<SoftwareBitBang> bus(44);
+PJON<SoftwareBitBang> bus(PJON_ID);
 
 enum {
 	channelC, channelL
