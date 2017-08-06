@@ -30,3 +30,10 @@
 *.exe
 *.out
 *.app
+*.elf
+
+.project
+Release
+.cproject
+.ino.cpp
+.settings
