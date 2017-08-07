@@ -22,10 +22,10 @@ void busReceiver(const TCommand *payload, const PJON_Packet_Info &packet_info) {
 	case cmdCalibrate:
 		switch (payload->cal.channel) {
 		case channelC:
-			calibrate2();
+			calibrate2(true);
 			break;
 		case channelL:
-			calibrate1();
+			calibrate1(true);
 			break;
 		}
 		break;
@@ -54,32 +54,38 @@ void setup()
 
   stepper1.setCurrentPosition(0);       // Set "Zero" position "L" Motor 1
   stepper2.setCurrentPosition(0);       // Set "Zero" position "C" Motor 2
-  calibrate1();                         // Calibration function "L" Motor 1
-  calibrate2();                         // Calibration function "C" Motor 2
+  calibrate1(false);                    // Calibration function "L" Motor 1
+  calibrate2(false);                    // Calibration function "C" Motor 2
 }
 
 // Calibration process for "L" Motor 1
-void calibrate1() {
+void calibrate1(boolean run) {
   long oldPosition = stepper1.currentPosition();
   stepper1.setSpeed(-600);
   while (digitalRead(optInpin1) == LOW) {
     stepper1.runSpeed();
+    busLoop();
   }
   stepper1.stop();
   stepper1.setCurrentPosition(0);
-  // stepper1.moveTo(oldPosition);
+  if (run) {
+    stepper1.moveTo(oldPosition);
+  }
 }
 
 // Calibration process for "C" Motor 2
-void calibrate2() {
+void calibrate2(boolean run) {
   long oldPosition = stepper2.currentPosition();
   stepper2.setSpeed(-600);
   while (digitalRead(optInpin2) == LOW) {
     stepper2.runSpeed();
+    busLoop();
   }
   stepper2.stop();
   stepper2.setCurrentPosition(0);
-  // stepper2.moveTo(oldPosition);
+  if (run) {
+    stepper2.moveTo(oldPosition);
+  }
 }
 
 void loop() {
