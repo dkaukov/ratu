@@ -91,5 +91,21 @@ inline void busLoop() {
 	bus.update();
 }
 
+inline uint16_t mechSetPosition(long l, long c) {
+	TCommand cmd = {
+		.id = cmdSetPos
+	};
+	cmd.pos.lPos = l;
+	cmd.pos.cPos = c;
+	return bus.send(ID_MECH, (char *)&cmd, sizeof(cmd));
+}
+
+inline uint16_t mechCalibrate(uint8_t ch) {
+	TCommand cmd = {
+		.id = cmdCalibrate
+	};
+	cmd.cal.channel = ch;
+	return bus.send(ID_MECH, (char *)&cmd, sizeof(cmd));
+}
 
 #endif /* PROTO_COMMON_H_ */
