@@ -12,6 +12,7 @@
 #define PROTO_COMMON_H_
 
 
+#define PJON_INCLUDE_SWBB
 #define SWBB_MODE 2
 #define SWBB_RESPONSE_TIMEOUT 1500
 #define SWBB_BACK_OFF_DEGREE     4
