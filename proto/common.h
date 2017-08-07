@@ -12,6 +12,9 @@
 #define PROTO_COMMON_H_
 
 
+#define PJON_MAX_PACKETS 4
+#define PJON_PACKET_MAX_LENGTH 12
+
 #define PJON_INCLUDE_SWBB
 #define PJON_INCLUDE_ASYNC_ACK true
 #define SWBB_MODE 2
