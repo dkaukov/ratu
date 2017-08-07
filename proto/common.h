@@ -60,10 +60,29 @@ void __busReceiver(uint8_t *payload, uint16_t length,	const PJON_Packet_Info &pa
 	}
 }
 
+void __busErrorHandler(uint8_t code, uint8_t data) {
+  if(code == PJON_CONNECTION_LOST) {
+    Serial.print("Connection with device ID ");
+    Serial.print(bus.packets[data].content[0], DEC);
+    Serial.println(" is lost.");
+  }
+  if(code == PJON_PACKETS_BUFFER_FULL) {
+    Serial.print("Packet buffer is full, has now a length of ");
+    Serial.println(data, DEC);
+    Serial.println("Possible wrong bus configuration!");
+    Serial.println("higher PJON_MAX_PACKETS if necessary.");
+  }
+  if(code == PJON_CONTENT_TOO_LONG) {
+    Serial.print("Content is too long, length: ");
+    Serial.println(data);
+  }
+};
+
 inline void busInit(PROTO_Receiver rcv) {
 	bus.strategy.set_pin(2);
 	bus.set_receiver(__busReceiver);
 	bus.set_asynchronous_acknowledge(true);
+	bus.set_error(__busErrorHandler);
 	__rcv = rcv;
 }
 
