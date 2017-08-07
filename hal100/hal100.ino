@@ -53,12 +53,6 @@ float valueC = 0;           // calculated value C float
 float valueL = 0;           // calculated value L float
 float Cmult;                // constant multiplier to calculate C value
 float Lmult;                // constant multiplier to calculate L value
-float totalStepsC;          // amount of steps in single 260 degree rotation
-float pFmin;                // value of minimum pF in given variable capacitor
-float pFmax;                // value of maximum pF in given variable capacitor
-float pFtotalValue;         // = maximum pF - minimum pF
-float pFperStep;            // value of pF in one motor step
-float valueRotateC;         // steps neede to rotate to calculated C value
 
 boolean presentValue = false;
 
@@ -284,6 +278,7 @@ void calculateC() {                             // Calculate value C from entere
   PlanckTime = 299792458;
   Cmult = 1.5;
   valueC = PlanckTime / ( tuningFreqCalc * KHz ) * Cmult;
+  Serial.print("Value C pF=");
   Serial.println(valueC);
 }
 
@@ -291,20 +286,21 @@ void calculateL () {                            // Calculate "L" value from form
   pi = 3.14159;
   Lmult = 1000000000000;
   valueL = ((1 / (2 * pi * tuningFreqCalc * valueC)) / (2 * pi * tuningFreqCalc)) * Lmult;
+  Serial.print("Value L uH=");
   Serial.println(valueL);
 }
 
 void calculateStepsC() {                        // calculate needed steps for C
-  // Process for linear capacitor with 22-360 pH - need to ajust or change for different capacitor
-
-  totalStepsC = 2964;
-  pFmin = 22;
-  pFmax = 360;
-  pFtotalValue = pFmax - pFmin;
-//  Serial.println(pFtotalValue);
-  pFperStep = pFtotalValue / ( totalStepsC / 2 );
-//  Serial.println(pFperStep);
-  valueRotateC = ( valueC - pFmin ) / pFperStep;
+  // Process for linear capacitor with 44-408 pF - need to ajust or change for different capacitor
+  float totalStepsC = 2964;
+  float pFmin = 20;
+  float pFmax = 200;
+  float pFtotalValue = pFmax - pFmin;
+  Serial.println(pFtotalValue);
+  float pFperStep = pFtotalValue / ( totalStepsC / 2 );
+  Serial.println(pFperStep);
+  float valueRotateC = ( valueC - pFmin ) / pFperStep;
+  Serial.print("steps C to rotate=");
   Serial.println(valueRotateC);
 }
 
@@ -313,7 +309,15 @@ void CmoveStage1() {                            // Send commandn to move motor C
 }
 
 void calculateStepsL() {                        // calculate needed steps for L
- // Process for non-linear variable inductor - need to ajust or change for different capacitor  
+ // Process for non-linear variable inductor - need to ajust or change for different inductor  
+ // y = -0.0299x2 + 1.3867x + 0.5894
+ float totalStepsL = 2964;                                                              // total motor steps for 1 rotation
+ float LturnsRequred = ( -0.0299 * valueL * valueL ) + ( 1.3867 * valueL ) + 0.5894;    // poly math
+ float valueRotateL = LturnsRequred * totalStepsL;
+ Serial.print("L turns requred=");
+ Serial.println(LturnsRequred);
+ Serial.print("steps L to rotate=");
+ Serial.println(valueRotateL);
  
 }
 
