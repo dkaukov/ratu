@@ -53,6 +53,8 @@ float valueC = 0;           // calculated value C float
 float valueL = 0;           // calculated value L float
 float Cmult;                // constant multiplier to calculate C value
 float Lmult;                // constant multiplier to calculate L value
+float valueRotateC;
+float valueRotateL;
 
 boolean presentValue = false;
 
@@ -146,6 +148,7 @@ void SetFrequency() {                               // when # pressed - sets fre
   displayC(), displayL();                           // display current values L and C at display
   tuningDisplay();                                  // flashing tuning - this to be changed to start at CmoveStage1 and finish after LmoveStage1
   displayTunedFreqTopScreen();                      // emulation of Green Tuned after motors in place
+  mechSetPosition(round (valueRotateL), round (valueRotateC));
   // End STAGE 1 tuning process
 }
 
@@ -299,7 +302,7 @@ void calculateStepsC() {                        // calculate needed steps for C
   Serial.println(pFtotalValue);
   float pFperStep = pFtotalValue / ( totalStepsC / 2 );
   Serial.println(pFperStep);
-  float valueRotateC = ( valueC - pFmin ) / pFperStep;
+  valueRotateC = ( valueC - pFmin ) / pFperStep;
   Serial.print("steps C to rotate=");
   Serial.println(valueRotateC);
 }
@@ -313,7 +316,7 @@ void calculateStepsL() {                        // calculate needed steps for L
  // y = -0.0299x2 + 1.3867x + 0.5894
  float totalStepsL = 2964;                                                              // total motor steps for 1 rotation
  float LturnsRequred = ( -0.0299 * valueL * valueL ) + ( 1.3867 * valueL ) + 0.5894;    // poly math
- float valueRotateL = LturnsRequred * totalStepsL;
+ valueRotateL = LturnsRequred * totalStepsL;
  Serial.print("L turns requred=");
  Serial.println(LturnsRequred);
  Serial.print("steps L to rotate=");
@@ -349,9 +352,13 @@ void keypadEvent(KeypadEvent eKey) {
         case '*':                           // erase entered frequency
           eraseFrequency();
           break;
-        case 'K':                           // calibrate both motors
-          calibrateMotors();
+        case 'U':                           // calibrate both motors
+          mechCalibrate(channelC);
           break;
+        case 'D':                           // calibrate both motors
+          mechCalibrate(channelL);
+          break;
+          
       }
   }
 }
