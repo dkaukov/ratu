@@ -13,6 +13,7 @@
 
 
 #define PJON_INCLUDE_SWBB
+#define PJON_INCLUDE_ASYNC_ACK true
 #define SWBB_MODE 2
 #define SWBB_RESPONSE_TIMEOUT 1500
 #define SWBB_BACK_OFF_DEGREE     4
@@ -62,6 +63,7 @@ void __busReceiver(uint8_t *payload, uint16_t length,	const PJON_Packet_Info &pa
 inline void busInit(PROTO_Receiver rcv) {
 	bus.strategy.set_pin(2);
 	bus.set_receiver(__busReceiver);
+	bus.set_asynchronous_acknowledge(true);
 	__rcv = rcv;
 }
 
