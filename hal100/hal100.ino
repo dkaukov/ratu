@@ -50,6 +50,7 @@ float KHz;                  // KHz constant
 float PlanckTime;           // Planck constant
 float pi;                   // π constant
 float valueC = 0;           // calculated value C float
+float valueCEffective = 0;  // calculated value C float
 float valueL = 0;           // calculated value L float
 float valueCorr = 0;        // calculated value C float
 float valueLcorr = 0;       // calculated value L float
@@ -307,7 +308,8 @@ void calculateC() {                             // Calculate value C from entere
   KHz = 1000;
   PlanckTime = 299792458;
   Cmult = 1.5;
-  valueC = PlanckTime / ( tuningFreqCalc * KHz ) * Cmult + valueCorr;
+  valueCEffective = PlanckTime / ( tuningFreqCalc * KHz ) * Cmult;
+  valueC = valueCEffective + valueCorr;
   Serial.print("Value C pF=");
   Serial.println(valueC);
 }
@@ -315,7 +317,7 @@ void calculateC() {                             // Calculate value C from entere
 void calculateL () {                            // Calculate "L" value from formula L=((1/(2*π*f*C))/(2*π*f))*1000000000000 (where f in KHz and C in pF)
   pi = 3.14159;
   Lmult = 1000000000000;
-  valueL = ((1 / (2 * pi * tuningFreqCalc * valueC)) / (2 * pi * tuningFreqCalc)) * Lmult + valueLcorr;
+  valueL = ((1 / (2 * pi * tuningFreqCalc * (valueCEffective))) / (2 * pi * tuningFreqCalc)) * Lmult + valueLcorr;
   Serial.print("Value L uH=");
   Serial.println(valueL);
 }
