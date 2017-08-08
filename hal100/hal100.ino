@@ -51,6 +51,8 @@ float PlanckTime;           // Planck constant
 float pi;                   // π constant
 float valueC = 0;           // calculated value C float
 float valueL = 0;           // calculated value L float
+float valueCorr = 0;        // calculated value C float
+float valueLcorr = 0;       // calculated value L float
 float Cmult;                // constant multiplier to calculate C value
 float Lmult;                // constant multiplier to calculate L value
 float valueRotateC;
@@ -130,27 +132,30 @@ void displayInitialScreen() {                      // displays "Wait Calibrating
   keypad.addEventListener(keypadEvent);             //add an event listener for this keypad
 }
 
-void SetFrequency() {                               // when # pressed - sets frequency value at the top of the screen
+void SetFrequencyStage1() {
+	// STAGE 1 tuning process
+	calculateC();                                     // calculate C value at selected frequency
+	calculateStepsC();                                // calculate steps needed to move C to value C
+	CmoveStage1();                                    // send command to nano to move motor "C" to C step value
+	calculateL();                                     // calculate L value at given frequency and C value
+	calculateStepsL();                                // calculate steps needed to move C to value L
+	LmoveStage1();                                    // send command to nano to move motor "L" to L step value
+	EraseDisplayC(), EraseDisplayL();                 // clear previous values L and C at display
+	displayC(), displayL();                           // display current values L and C at display
+	tuningDisplay();                                  // flashing tuning - this to be changed to start at CmoveStage1 and finish after LmoveStage1
+	displayTunedFreqTopScreen();                      // emulation of Green Tuned after motors in place
+	mechSetPosition(round (valueRotateL), round (valueRotateC));
+	// End STAGE 1 tuning process
+}
 
+void SetFrequency() {                               // when # pressed - sets frequency value at the top of the screen
   // Pre-STAGE 1 (coarse tuning process) cleanups and displays
   eraseFreqTopScreen();                             // clear previously entered drequesncy at display top
   displayFreqTopScreen();                           // display desired frequesncy at display top
   eraseEnteredFrequency();                          // clear entered frequency at display bottom
- 
-  // STAGE 1 tuning process
-  calculateC();                                     // calculate C value at selected frequency
-  calculateStepsC();                                // calculate steps needed to move C to value C
-  CmoveStage1();                                    // send command to nano to move motor "C" to C step value
-  calculateL();                                     // calculate L value at given frequency and C value
-  calculateStepsL();                                // calculate steps needed to move C to value L
-  LmoveStage1();                                    // send command to nano to move motor "L" to L step value
-  EraseDisplayC(), EraseDisplayL();                 // clear previous values L and C at display
-  displayC(), displayL();                           // display current values L and C at display
-  tuningDisplay();                                  // flashing tuning - this to be changed to start at CmoveStage1 and finish after LmoveStage1
-  displayTunedFreqTopScreen();                      // emulation of Green Tuned after motors in place
-  mechSetPosition(round (valueRotateL), round (valueRotateC));
-  // End STAGE 1 tuning process
+  SetFrequencyStage1();
 }
+
 
 void incL(float diff) {
 	valueRotateL = valueRotateL + diff;
@@ -161,6 +166,19 @@ void incC(float diff) {
 	valueRotateC = valueRotateC + diff;
 	mechSetPosition(round (valueRotateL), round (valueRotateC));
 }
+
+void incLCorr(float diff) {
+	valueLcorr = valueLcorr + diff;
+	SetFrequencyStage1();
+
+}
+
+void incCCorr(float diff) {
+	valueCorr = valueCorr + diff;
+	SetFrequencyStage1();
+}
+
+
 void LtoCCW() {                                   // when L pressed - moves motor L 1 step CCW and displays left arrows
   TFTscreen.stroke(255, 255, 0);
   TFTscreen.setTextSize(1);
@@ -289,7 +307,7 @@ void calculateC() {                             // Calculate value C from entere
   KHz = 1000;
   PlanckTime = 299792458;
   Cmult = 1.5;
-  valueC = PlanckTime / ( tuningFreqCalc * KHz ) * Cmult;
+  valueC = PlanckTime / ( tuningFreqCalc * KHz ) * Cmult + valueCorr;
   Serial.print("Value C pF=");
   Serial.println(valueC);
 }
@@ -297,7 +315,7 @@ void calculateC() {                             // Calculate value C from entere
 void calculateL () {                            // Calculate "L" value from formula L=((1/(2*π*f*C))/(2*π*f))*1000000000000 (where f in KHz and C in pF)
   pi = 3.14159;
   Lmult = 1000000000000;
-  valueL = ((1 / (2 * pi * tuningFreqCalc * valueC)) / (2 * pi * tuningFreqCalc)) * Lmult;
+  valueL = ((1 / (2 * pi * tuningFreqCalc * valueC)) / (2 * pi * tuningFreqCalc)) * Lmult + valueLcorr;
   Serial.print("Value L uH=");
   Serial.println(valueL);
 }
