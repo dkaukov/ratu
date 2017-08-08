@@ -152,6 +152,15 @@ void SetFrequency() {                               // when # pressed - sets fre
   // End STAGE 1 tuning process
 }
 
+void incL(float diff) {
+	valueRotateL = valueRotateL + diff;
+	mechSetPosition(round (valueRotateL), round (valueRotateC));
+}
+
+void incC(float diff) {
+	valueRotateC = valueRotateC + diff;
+	mechSetPosition(round (valueRotateL), round (valueRotateC));
+}
 void LtoCCW() {                                   // when L pressed - moves motor L 1 step CCW and displays left arrows
   TFTscreen.stroke(255, 255, 0);
   TFTscreen.setTextSize(1);
