@@ -143,9 +143,7 @@ void SetFrequencyStage1() {
 	LmoveStage1();                                    // send command to nano to move motor "L" to L step value
 	EraseDisplayC(), EraseDisplayL();                 // clear previous values L and C at display
 	displayC(), displayL();                           // display current values L and C at display
-	tuningDisplay();                                  // flashing tuning - this to be changed to start at CmoveStage1 and finish after LmoveStage1
-	displayTunedFreqTopScreen();                      // emulation of Green Tuned after motors in place
-	mechSetPosition(round (valueRotateL), round (valueRotateC));
+  mechSetPosition(round (valueRotateL), round (valueRotateC));
 	// End STAGE 1 tuning process
 }
 
@@ -169,52 +167,19 @@ void incC(float diff) {
 }
 
 void incLCorr(float diff) {
-	valueLcorr = valueLcorr + diff;
-	SetFrequencyStage1();
-
+    if (tuningFreqCalc != 0.0) {
+      valueLcorr = valueLcorr + diff;
+      SetFrequencyStage1();
+    }
 }
 
 void incCCorr(float diff) {
-	valueCorr = valueCorr + diff;
-	SetFrequencyStage1();
+    if (tuningFreqCalc != 0.0) {
+      valueCorr = valueCorr + diff;
+      SetFrequencyStage1();
+    }
 }
 
-
-void LtoCCW() {                                   // when L pressed - moves motor L 1 step CCW and displays left arrows
-  TFTscreen.stroke(255, 255, 0);
-  TFTscreen.setTextSize(1);
-  TFTscreen.text("<<<", 7, 60);
-  delay(1000);
-  TFTscreen.stroke(0, 20, 30);
-  TFTscreen.text("<<<", 7, 60);
-}
-
-void LtoCW() {                                   // when l pressed - moves motor L 1 step CW and displays left arrows
-  TFTscreen.stroke(255, 255, 0);
-  TFTscreen.setTextSize(1);
-  TFTscreen.text(">>>", 55, 60);
-  delay(1000);
-  TFTscreen.stroke(0, 20, 30);
-  TFTscreen.text(">>>", 55, 60);
-}
-
-void CtoCCW() {                                   // when C pressed - moves motor L 1 step CCW and displays left arrows
-  TFTscreen.stroke(255, 255, 0);
-  TFTscreen.setTextSize(1);
-  TFTscreen.text("<<<", 67, 60);
-  delay(1000);
-  TFTscreen.stroke(0, 20, 30);
-  TFTscreen.text("<<<", 67, 60);
-}
-
-void CtoCW() {                                   // when c pressed - moves motor L 1 step CW and displays left arrows
-  TFTscreen.stroke(255, 255, 0);
-  TFTscreen.setTextSize(1);
-  TFTscreen.text(">>>", 112, 60);
-  delay(1000);
-  TFTscreen.stroke(0, 20, 30);
-  TFTscreen.text(">>>", 112, 60);
-}
 
 void eraseFreqTopScreen() {                      // erases frequency value from top of display
   TFTscreen.stroke(0, 20, 30);
@@ -367,16 +332,16 @@ void keypadEvent(KeypadEvent eKey) {
           SetFrequency();
           break;
         case 'C':                           // will be used for "C" motor move 1 step CCW
-          CtoCCW();
+          incCCorr(-1);
           break;
         case 'c':                           // will be used for "C" motor move 1 step CW
-          CtoCW();
+          incCCorr(1);
           break;
         case 'L':                           // used for "L" motor move 1 step CCW
-          LtoCCW();
+          incLCorr(-0.001);
           break;
         case 'l':                           // used for "L" motor move 1 step CW
-          LtoCW();
+          incLCorr(0.001);
           break;
         case '*':                           // erase entered frequency
           eraseFrequency();
