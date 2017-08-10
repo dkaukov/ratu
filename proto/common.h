@@ -12,7 +12,7 @@
 #define PROTO_COMMON_H_
 
 
-#define PJON_MAX_PACKETS 		2
+#define PJON_MAX_PACKETS 		4
 #define PJON_PACKET_MAX_LENGTH 	20
 
 #define PJON_INCLUDE_SWBB
@@ -100,7 +100,7 @@ inline uint16_t mechSetPosition(long l, long c) {
 	};
 	cmd.pos.lPos = l;
 	cmd.pos.cPos = c;
-	return bus.send(ID_MECH, (char *)&cmd, sizeof(cmd));
+	return bus.send_packet_blocking(ID_MECH, (char *)&cmd, sizeof(cmd));
 }
 
 inline uint16_t mechCalibrate(uint8_t ch) {
