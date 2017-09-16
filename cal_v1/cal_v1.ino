@@ -124,11 +124,11 @@ void displayInitialScreen() {                      // displays "Wait Calibrating
   // Displays L
   TFTscreen.stroke(0, 255, 0);                      // set the font color
   TFTscreen.setTextSize(2);                         // set the font size 2
-  TFTscreen.text("n ", 30, 55);                     // write the text to coordinates
+  TFTscreen.text("Ln", 30, 55);                     // write the text to coordinates
   // Displays C
   TFTscreen.stroke(0, 255, 0);                      // set the font color
   TFTscreen.setTextSize(2);                         // set the font size 2
-  TFTscreen.text("n ", 90, 55);                     // write the text to coordinates
+  TFTscreen.text("Cn", 90, 55);                     // write the text to coordinates
 
   keypad.addEventListener(keypadEvent);             //add an event listener for this keypad
 }
@@ -157,12 +157,14 @@ void SetFrequency() {                               // when # pressed - sets fre
 
 
 void incL(float diff) {
+	EraseDisplayL();
 	valueRotateL = valueRotateL + diff;
 	displayL();
 	mechSetPosition(round (valueRotateL), round (valueRotateC));
 }
 
 void incC(float diff) {
+	EraseDisplayC();
 	valueRotateC = valueRotateC + diff;
 	displayC();
 	mechSetPosition(round (valueRotateL), round (valueRotateC));
@@ -340,10 +342,10 @@ void keypadEvent(KeypadEvent eKey) {
           incC(1);
           break;
         case 'L':                           // used for "L" motor move 1 step CCW
-          incL(-500.0);
+          incL(-100.0);
           break;
         case 'l':                           // used for "L" motor move 1 step CW
-          incL(+500.0);
+          incL(+100.0);
           break;
         case '*':                           // erase entered frequency
           eraseFrequency();
