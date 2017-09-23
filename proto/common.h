@@ -32,7 +32,8 @@ enum {
 
 enum {
 	cmdCalibrate,
-	cmdSetPos
+	cmdSetPos,
+	cmdStatus
 };
 
 typedef struct PROTO_PosParams {
@@ -41,17 +42,32 @@ typedef struct PROTO_PosParams {
 	long c2Pos;
 } PROTO_PosParams;
 
+typedef struct PROTO_AdcValues {
+	uint16_t fwd;
+	uint16_t rfl;
+} PROTO_AdcValues;
+
 typedef struct PROTO_CalParams {
 	uint8_t channel;
 } PROTO_CalParams;
+
+typedef struct PROTO_MechStatus {
+	uint8_t flags;
+	PROTO_PosParams pos;
+	PROTO_AdcValues adc;
+} PROTO_MechStatus;
+
 
 typedef struct TCommand {
 	uint8_t id;
 	union {
 		PROTO_CalParams cal;
 		PROTO_PosParams pos;
+		PROTO_MechStatus status;
 	};
 } TCommand;
+
+
 
 typedef void (*PROTO_Receiver)(const TCommand *payload,
 		const PJON_Packet_Info &packet_info);

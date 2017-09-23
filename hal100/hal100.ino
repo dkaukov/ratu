@@ -59,6 +59,7 @@ float Lmult;                // constant multiplier to calculate L value
 float valueRotateC1;
 float valueRotateC2;
 float valueRotateL;
+float valueSWR;
 
 boolean presentValue = false;
 
@@ -91,6 +92,16 @@ Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
 // end of Keypad code
 
 void busReceiver(const TCommand *payload, const PJON_Packet_Info &packet_info) {
+	switch (payload->id) {
+	case cmdCalibrate:
+		float rfl = payload->status.adc.rfl;
+		float fwd = payload->status.adc.fwd;
+		float p = sqrt(rfl / fwd);
+		valueSWR = (1 + p) / (1 - p);
+		Serial.print("Value SWR=");
+		Serial.println(valueSWR);
+		break;
+	}
 }
 
 void setup() {

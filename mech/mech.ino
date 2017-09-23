@@ -12,12 +12,15 @@
 AccelStepper stepper1 = AccelStepper(1, 3, 4);  // Custom pinout "L" - Step to D3, Dir to D4 (Default AccelStepper::FULL4WIRE (4 pins) on 2, 3, 4, 5)
 AccelStepper stepper2 = AccelStepper(1, 5, 6);  // Custom pinout "C" - Step to D5, Dir to D6 (Default AccelStepper::FULL4WIRE (4 pins) on 2, 3, 4, 5)
 AccelStepper stepper3 = AccelStepper(1, 7, 8);  // Custom pinout "C" - Step to D7, Dir to D8 (Default AccelStepper::FULL4WIRE (4 pins) on 2, 3, 4, 5)
+TCommand status;
 
 const byte ledPin = 13;     // Initialise LED for indication
 const byte optInpin1 = A1;  // Signal pin Optical Interruptor Motor 1
 const byte optInpin2 = A2;  // Signal pin Optical Interruptor Motor 2
 const byte optInpin3 = A3;  // Signal pin Optical Interruptor Motor 3 C2
 
+const byte fwdPwr = A5;     // Fwd signal from SWR sensor
+const byte rflPwr = A6;     // Rev. signal from SWR sensor
 
 void busReceiver(const TCommand *payload, const PJON_Packet_Info &packet_info) {
 	switch (payload->id) {
@@ -46,6 +49,10 @@ void setup()
 {
   Serial.begin(9600);                   // Start Serial
   busInit(busReceiver);
+
+  pinMode(fwdPwr, INPUT);
+  pinMode(rflPwr, INPUT);
+
   pinMode(ledPin, OUTPUT);              // Defines LED
   pinMode(optInpin1, INPUT);            //  Defines Optical command PIN "L"
   pinMode(optInpin2, INPUT);            //  Defines Optical command PIN "C"
@@ -114,6 +121,27 @@ void calibrate3(boolean run) {
     stepper3.moveTo(oldPosition);
   }
 
+}
+
+void updateStatus() {
+	status.id = cmdStatus;
+	status.status.adc.fwd = analogRead(fwdPwr);
+	status.status.adc.rfl = analogRead(rflPwr);
+	status.status.flags = stepper1.isRunning() || stepper1.isRunning() << 1 || stepper3.isRunning() << 2;
+	status.status.pos.lPos  = stepper1.currentPosition();
+	status.status.pos.c1Pos = stepper2.currentPosition();
+	status.status.pos.c2Pos = stepper3.currentPosition();
+}
+
+void sendStatusUpdates() {
+	static const unsigned long REFRESH_INTERVAL = 500; // ms
+		static unsigned long lastRefreshTime = 0;
+		if(millis() - lastRefreshTime >= REFRESH_INTERVAL)
+		{
+			lastRefreshTime += REFRESH_INTERVAL;
+			updateStatus();
+			bus.send(ID_HAL100, (char *)&status, sizeof(status));
+		}
 }
 
 void loop() {
