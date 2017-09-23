@@ -56,7 +56,8 @@ float valueCorr = 0;        // calculated value C float
 float valueLcorr = 0;       // calculated value L float
 float Cmult;                // constant multiplier to calculate C value
 float Lmult;                // constant multiplier to calculate L value
-float valueRotateC;
+float valueRotateC1;
+float valueRotateC2;
 float valueRotateL;
 
 boolean presentValue = false;
@@ -143,7 +144,7 @@ void SetFrequencyStage1() {
 	LmoveStage1();                                    // send command to nano to move motor "L" to L step value
 	EraseDisplayC(), EraseDisplayL();                 // clear previous values L and C at display
 	displayC(), displayL();                           // display current values L and C at display
-  mechSetPosition(round (valueRotateL), round (valueRotateC));
+	mechSetPosition(round (valueRotateL), round (valueRotateC1), round (valueRotateC2));
 	// End STAGE 1 tuning process
 }
 
@@ -158,12 +159,12 @@ void SetFrequency() {                               // when # pressed - sets fre
 
 void incL(float diff) {
 	valueRotateL = valueRotateL + diff;
-	mechSetPosition(round (valueRotateL), round (valueRotateC));
+	mechSetPosition(round (valueRotateL), round (valueRotateC1), round (valueRotateC2));
 }
 
 void incC(float diff) {
-	valueRotateC = valueRotateC + diff;
-	mechSetPosition(round (valueRotateL), round (valueRotateC));
+	valueRotateC1 = valueRotateC1 + diff;
+	mechSetPosition(round (valueRotateL), round (valueRotateC1), round (valueRotateC2));
 }
 
 void incLCorr(float diff) {
@@ -296,9 +297,9 @@ void calculateStepsC() {                        // calculate needed steps for C
   Serial.println(pFtotalValue);
   float pFperStep = pFtotalValue / ( totalStepsC / 2 );
   Serial.println(pFperStep);
-  valueRotateC = ( valueC - pFmin ) / pFperStep;
+  valueRotateC1 = ( valueC - pFmin ) / pFperStep;
   Serial.print("steps C to rotate=");
-  Serial.println(valueRotateC);
+  Serial.println(valueRotateC1);
 }
 
 void CmoveStage1() {                            // Send commandn to move motor C
@@ -347,7 +348,7 @@ void keypadEvent(KeypadEvent eKey) {
           eraseFrequency();
           break;
         case 'U':                           // calibrate both motors
-          mechCalibrate(channelC);
+          mechCalibrate(channelC1);
           break;
         case 'D':                           // calibrate both motors
           mechCalibrate(channelL);

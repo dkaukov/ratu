@@ -27,7 +27,7 @@
 PJON<SoftwareBitBang> bus(PJON_ID);
 
 enum {
-	channelC, channelL
+	channelC1, channelC2, channelL
 };
 
 enum {
@@ -37,7 +37,8 @@ enum {
 
 typedef struct PROTO_PosParams {
 	long lPos;
-	long cPos;
+	long c1Pos;
+	long c2Pos;
 } PROTO_PosParams;
 
 typedef struct PROTO_CalParams {
@@ -94,12 +95,13 @@ inline void busLoop() {
 	bus.update();
 }
 
-inline uint16_t mechSetPosition(long l, long c) {
+inline uint16_t mechSetPosition(long l, long c1, long c2) {
 	TCommand cmd = {
 		.id = cmdSetPos
 	};
 	cmd.pos.lPos = l;
-	cmd.pos.cPos = c;
+	cmd.pos.c1Pos = c1;
+	cmd.pos.c2Pos = c2;
 	return bus.send_packet_blocking(ID_MECH, (char *)&cmd, sizeof(cmd));
 }
 

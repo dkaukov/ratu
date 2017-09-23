@@ -11,17 +11,22 @@
 
 AccelStepper stepper1 = AccelStepper(1, 3, 4);  // Custom pinout "L" - Step to D3, Dir to D4 (Default AccelStepper::FULL4WIRE (4 pins) on 2, 3, 4, 5)
 AccelStepper stepper2 = AccelStepper(1, 5, 6);  // Custom pinout "C" - Step to D5, Dir to D6 (Default AccelStepper::FULL4WIRE (4 pins) on 2, 3, 4, 5)
+AccelStepper stepper3 = AccelStepper(1, 7, 8);  // Custom pinout "C" - Step to D7, Dir to D8 (Default AccelStepper::FULL4WIRE (4 pins) on 2, 3, 4, 5)
 
 const byte ledPin = 13;     // Initialise LED for indication
 const byte optInpin1 = A1;  // Signal pin Optical Interruptor Motor 1
 const byte optInpin2 = A2;  // Signal pin Optical Interruptor Motor 2
+const byte optInpin3 = A3;  // Signal pin Optical Interruptor Motor 3 C2
 
 
 void busReceiver(const TCommand *payload, const PJON_Packet_Info &packet_info) {
 	switch (payload->id) {
 	case cmdCalibrate:
 		switch (payload->cal.channel) {
-		case channelC:
+		case channelC1:
+			calibrate2(true);
+			break;
+		case channelC2:
 			calibrate2(true);
 			break;
 		case channelL:
@@ -31,7 +36,8 @@ void busReceiver(const TCommand *payload, const PJON_Packet_Info &packet_info) {
 		break;
 	case cmdSetPos:
 		stepper1.moveTo(payload->pos.lPos);
-		stepper2.moveTo(payload->pos.cPos);
+		stepper2.moveTo(payload->pos.c1Pos);
+		stepper2.moveTo(payload->pos.c2Pos);
 		break;
 	}
 }
@@ -52,10 +58,16 @@ void setup()
   stepper2.setSpeed(500);               //  Set maximum calibration speed for "C" Motor 2
   stepper2.setAcceleration(2000);       //  Set maximum acceleration for "C" Motor 2
 
+  stepper3.setMaxSpeed(2000);           //  Set maximum roration speed for "C" Motor 3
+  stepper3.setSpeed(500);               //  Set maximum calibration speed for "C" Motor 3
+  stepper3.setAcceleration(2000);       //  Set maximum acceleration for "C" Motor 3
+
   stepper1.setCurrentPosition(0);       // Set "Zero" position "L" Motor 1
   stepper2.setCurrentPosition(0);       // Set "Zero" position "C" Motor 2
+  stepper3.setCurrentPosition(0);       // Set "Zero" position "C" Motor 3
   calibrate1(false);                    // Calibration function "L" Motor 1
   calibrate2(false);                    // Calibration function "C" Motor 2
+  //calibrate3(false);                  // Calibration function "C" Motor 3
 }
 
 // Calibration process for "L" Motor 1
@@ -86,6 +98,22 @@ void calibrate2(boolean run) {
   if (run) {
     stepper2.moveTo(oldPosition);
   }
+}
+
+// Calibration process for "C" Motor 3
+void calibrate3(boolean run) {
+  long oldPosition = stepper3.currentPosition();
+  stepper3.setSpeed(-600);
+  while (digitalRead(optInpin3) == LOW) {
+    stepper3.runSpeed();
+    busLoop();
+  }
+  stepper3.stop();
+  stepper3.setCurrentPosition(0);
+  if (run) {
+    stepper3.moveTo(oldPosition);
+  }
+
 }
 
 void loop() {

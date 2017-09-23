@@ -56,7 +56,8 @@ float valueCorr = 0;        // calculated value C float
 float valueLcorr = 0;       // calculated value L float
 float Cmult;                // constant multiplier to calculate C value
 float Lmult;                // constant multiplier to calculate L value
-float valueRotateC;
+float valueRotateC1;
+float valueRotateC2;
 float valueRotateL;
 
 boolean presentValue = false;
@@ -160,14 +161,14 @@ void incL(float diff) {
 	EraseDisplayL();
 	valueRotateL = valueRotateL + diff;
 	displayL();
-	mechSetPosition(round (valueRotateL), round (valueRotateC));
+	mechSetPosition(round (valueRotateL), round (valueRotateC1), round (valueRotateC2));
 }
 
 void incC(float diff) {
 	EraseDisplayC();
-	valueRotateC = valueRotateC + diff;
+	valueRotateC1 = valueRotateC1 + diff;
 	displayC();
-	mechSetPosition(round (valueRotateL), round (valueRotateC));
+	mechSetPosition(round (valueRotateL), round (valueRotateC1), round (valueRotateC2));
 }
 
 void incLCorr(float diff) {
@@ -227,7 +228,7 @@ void EraseDisplayL() {                                   // erase display L valu
 }
 
 void displayC() {                                       // display C values
-  dtostrf(valueRotateC, 5, 0, DisplayValueC);
+  dtostrf(valueRotateC1, 5, 0, DisplayValueC);
   TFTscreen.stroke(0, 255, 0);
   TFTscreen.setTextSize(2);
   TFTscreen.text(DisplayValueC, 60, 75);
@@ -300,9 +301,9 @@ void calculateStepsC() {                        // calculate needed steps for C
   Serial.println(pFtotalValue);
   float pFperStep = pFtotalValue / ( totalStepsC / 2 );
   Serial.println(pFperStep);
-  valueRotateC = ( valueC - pFmin ) / pFperStep;
+  valueRotateC1 = ( valueC - pFmin ) / pFperStep;
   Serial.print("steps C to rotate=");
-  Serial.println(valueRotateC);
+  Serial.println(valueRotateC1);
 }
 
 void CmoveStage1() {                            // Send commandn to move motor C
@@ -351,7 +352,7 @@ void keypadEvent(KeypadEvent eKey) {
           eraseFrequency();
           break;
         case 'U':                           // calibrate both motors
-          mechCalibrate(channelC);
+          mechCalibrate(channelC1);
           break;
         case 'D':                           // calibrate both motors
           mechCalibrate(channelL);
