@@ -74,7 +74,7 @@ typedef void (*PROTO_Receiver)(const TCommand *payload,
 
 PROTO_Receiver __rcv = NULL;
 
-void __busReceiver(uint8_t *payload, uint16_t length,	const PJON_Packet_Info &packet_info) {
+void __busReceiver(uint8_t *payload, uint16_t length, const PJON_Packet_Info &packet_info) {
 	if (length == sizeof(TCommand) && __rcv != NULL) {
 		__rcv((TCommand *) payload, packet_info);
 	}
