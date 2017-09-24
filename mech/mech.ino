@@ -136,10 +136,18 @@ void updateStatus() {
 	Serial.println(status.status.adc.fwd);
 	Serial.print("Value rfl=");
 	Serial.println(status.status.adc.rfl);
+
+	float rfl = status.status.adc.rfl;
+	float fwd = status.status.adc.fwd;
+	float p = sqrt(rfl / fwd);
+	float valueSWR = (1 + p) / (1 - p);
+	Serial.print("Value SWR=");
+	Serial.println(valueSWR);
+
 }
 
 void sendStatusUpdates() {
-	static const unsigned long REFRESH_INTERVAL = 5000; // ms
+	static const unsigned long REFRESH_INTERVAL = 1000; // ms
 		static unsigned long lastRefreshTime = 0;
 		if(millis() - lastRefreshTime >= REFRESH_INTERVAL)
 		{
