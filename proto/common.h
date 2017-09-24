@@ -142,7 +142,7 @@ inline uint16_t halSendStatusUpdate(PROTO_MechStatus &status) {
 		.id = cmdStatus
 	};
 	cmd.status = status;
-	return bus.send_packet_blocking(ID_HAL100, (char *)&cmd, sizeof(cmd));
+	return bus.send(ID_HAL100, (char *)&cmd, sizeof(cmd));
 }
 
 
