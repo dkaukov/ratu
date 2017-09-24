@@ -96,6 +96,14 @@ void __busErrorHandler(uint8_t code, uint8_t data) {
     Serial.print("Content is too long, length: ");
     Serial.println(data);
   }
+  if(code == PJON_ID_ACQUISITION_FAIL) {
+    Serial.print("ID Acqusition fail: ");
+    Serial.println(data);
+  }
+  if(code == PJON_DEVICES_BUFFER_FULL) {
+      Serial.print("Device buffer full: ");
+      Serial.println(data);
+  }
 };
 
 inline void busInit(PROTO_Receiver rcv) {
