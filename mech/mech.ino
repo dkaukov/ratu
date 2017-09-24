@@ -40,7 +40,7 @@ void busReceiver(const TCommand *payload, const PJON_Packet_Info &packet_info) {
 	case cmdSetPos:
 		stepper1.moveTo(payload->pos.lPos);
 		stepper2.moveTo(payload->pos.c1Pos);
-		stepper2.moveTo(payload->pos.c2Pos);
+		stepper3.moveTo(payload->pos.c2Pos);
 		break;
 	}
 }
