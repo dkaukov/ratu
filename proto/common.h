@@ -16,7 +16,7 @@
 #define PJON_PACKET_MAX_LENGTH 	30
 
 #define PJON_INCLUDE_SWBB
-#define PJON_INCLUDE_ASYNC_ACK 	true
+#define PJON_INCLUDE_ASYNC_ACK 	false
 #define SWBB_MODE 				2
 #define SWBB_RESPONSE_TIMEOUT 	1500
 #define SWBB_BACK_OFF_DEGREE	4
@@ -109,7 +109,7 @@ void __busErrorHandler(uint8_t code, uint8_t data) {
 inline void busInit(PROTO_Receiver rcv) {
 	bus.strategy.set_pin(2);
 	bus.set_receiver(__busReceiver);
-	bus.set_asynchronous_acknowledge(true);
+	bus.set_asynchronous_acknowledge(false);
 	bus.set_error(__busErrorHandler);
 	__rcv = rcv;
 }
