@@ -12,7 +12,7 @@
 AccelStepper stepper1 = AccelStepper(1, 3, 4);  // Custom pinout "L" - Step to D3, Dir to D4 (Default AccelStepper::FULL4WIRE (4 pins) on 2, 3, 4, 5)
 AccelStepper stepper2 = AccelStepper(1, 5, 6);  // Custom pinout "C" - Step to D5, Dir to D6 (Default AccelStepper::FULL4WIRE (4 pins) on 2, 3, 4, 5)
 AccelStepper stepper3 = AccelStepper(1, 7, 8);  // Custom pinout "C" - Step to D7, Dir to D8 (Default AccelStepper::FULL4WIRE (4 pins) on 2, 3, 4, 5)
-TCommand status;
+PROTO_MechStatus status;
 
 const byte ledPin = 13;     // Initialise LED for indication
 const byte optInpin1 = A1;  // Signal pin Optical Interruptor Motor 1
@@ -127,20 +127,19 @@ void calibrate3(boolean run) {
 }
 
 void updateStatus() {
-	status.id = cmdStatus;
-	analogRead(fwdPwr);	status.status.adc.fwd = analogRead(fwdPwr);
-	analogRead(rflPwr);	status.status.adc.rfl = analogRead(rflPwr);
-	status.status.flags = stepper1.isRunning() || stepper1.isRunning() << 1 || stepper3.isRunning() << 2;
-	status.status.cnt++;
+	analogRead(fwdPwr);	status.adc.fwd = analogRead(fwdPwr);
+	analogRead(rflPwr);	status.adc.rfl = analogRead(rflPwr);
+	status.flags = stepper1.isRunning() || stepper1.isRunning() << 1 || stepper3.isRunning() << 2;
+	status.cnt++;
 	Serial.print("cnt=");
-	Serial.print(status.status.cnt);
+	Serial.print(status.cnt);
 	Serial.print(", Value fwd=");
-	Serial.print(status.status.adc.fwd);
+	Serial.print(status.adc.fwd);
 	Serial.print(", Value rfl=");
-	Serial.print(status.status.adc.rfl);
+	Serial.print(status.adc.rfl);
 
-	float rfl = status.status.adc.rfl;
-	float fwd = status.status.adc.fwd;
+	float rfl = status.adc.rfl;
+	float fwd = status.adc.fwd;
 	float p = sqrt(rfl / fwd);
 	float valueSWR = (1 + p) / (1 - p);
 	Serial.print(", Value SWR=");
@@ -155,7 +154,7 @@ void sendStatusUpdates() {
 		{
 			lastRefreshTime = millis();
 			updateStatus();
-			bus.send_packet_blocking(ID_HAL100, (char *)&status, sizeof(status));
+			halSendStatusUpdate(status);
 		}
 }
 

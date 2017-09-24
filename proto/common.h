@@ -137,4 +137,13 @@ inline uint16_t mechCalibrate(uint8_t ch) {
 	return bus.send(ID_MECH, (char *)&cmd, sizeof(cmd));
 }
 
+inline uint16_t halSendStatusUpdate(PROTO_MechStatus &status) {
+	TCommand cmd = {
+		.id = cmdStatus
+	};
+	cmd.status = status;
+	return bus.send_packet_blocking(ID_HAL100, (char *)&cmd, sizeof(cmd));
+}
+
+
 #endif /* PROTO_COMMON_H_ */
