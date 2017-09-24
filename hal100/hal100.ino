@@ -93,7 +93,13 @@ Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
 
 void busReceiver(const TCommand *payload, const PJON_Packet_Info &packet_info) {
 	switch (payload->id) {
-	case cmdCalibrate:
+	case cmdStatus:
+
+		Serial.print("Value fwd=");
+		Serial.println(payload->status.adc.fwd);
+		Serial.print("Value rfl=");
+		Serial.println(payload->status.adc.rfl);
+
 		float rfl = payload->status.adc.rfl;
 		float fwd = payload->status.adc.fwd;
 		float p = sqrt(rfl / fwd);
