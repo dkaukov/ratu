@@ -125,18 +125,6 @@ void setup() {
 }
 
 void displayInitialScreen() {                      // displays "Wait Calibrating at start. To be linked to Motors "L" and "C" calibration process
-  for (i = 0; i < 1; i++) {                        // repeats following process for i-times
-    TFTscreen.stroke(255, 255, 0);
-    TFTscreen.setTextSize(2);
-    TFTscreen.text("WAIT", 50, 20);
-    TFTscreen.text("CALIBRATING", 0, 40);
-    delay(1000);
-    TFTscreen.stroke(0, 20, 30);
-    TFTscreen.text("WAIT", 50, 20);
-    TFTscreen.text("CALIBRATING", 0, 40);
-    delay(500);
-  }
-
   // Displays "Set F:" at the bottom of the screen
   TFTscreen.stroke(0, 255, 0);                      // set the font color
   TFTscreen.setTextSize(1);                         // set the font size 2
@@ -146,11 +134,11 @@ void displayInitialScreen() {                      // displays "Wait Calibrating
   // Displays L
   TFTscreen.stroke(0, 255, 0);                      // set the font color
   TFTscreen.setTextSize(2);                         // set the font size 2
-  TFTscreen.text("uH", 30, 55);                     // write the text to coordinates
+  TFTscreen.text("Ln", 5, 40);                     // write the text to coordinates  
   // Displays C
-  TFTscreen.stroke(0, 255, 0);                      // set the font color
+  TFTscreen.stroke(0, 255, 0);                      // set the font color             
   TFTscreen.setTextSize(2);                         // set the font size 2
-  TFTscreen.text("pF", 90, 55);                     // write the text to coordinates
+  TFTscreen.text("Cn", 5, 60);                     // write the text to coordinates
 
   keypad.addEventListener(keypadEvent);             //add an event listener for this keypad
 }
@@ -232,29 +220,29 @@ void eraseEnteredFrequency () {               // erase frequency value at the bo
 }
 
 void displayL() {                                         // display L values
-  dtostrf(valueL, 5, 2, DisplayValueL);
+  dtostrf(valueRotateL, 5, 2, DisplayValueL);
   TFTscreen.stroke(0, 255, 0);
   TFTscreen.setTextSize(2);
-  TFTscreen.text(DisplayValueL, 5, 75);
+  TFTscreen.text(DisplayValueL, 40, 40);
 }
 
 void EraseDisplayL() {                                   // erase display L values
   TFTscreen.stroke(0, 20, 30);
   TFTscreen.setTextSize(2);
-  TFTscreen.text(DisplayValueL, 5, 75);
+  TFTscreen.text(DisplayValueL, 40, 40);
 }
 
 void displayC() {                                       // display C values
-  dtostrf(valueC, 5, 0, DisplayValueC);
+  dtostrf(valueRotateC1, 5, 0, DisplayValueC);
   TFTscreen.stroke(0, 255, 0);
   TFTscreen.setTextSize(2);
-  TFTscreen.text(DisplayValueC, 60, 75);
+  TFTscreen.text(DisplayValueC, 40, 60);
 }
 
 void EraseDisplayC() {                                   // erase display C values
   TFTscreen.stroke(0, 20, 20);
   TFTscreen.setTextSize(2);
-  TFTscreen.text(DisplayValueC, 60, 75);
+  TFTscreen.text(DisplayValueC, 40, 60);
 }
 
 void eraseFrequency() {                         // when * pressed - erases entered frequency bottom of the screen
