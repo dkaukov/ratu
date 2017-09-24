@@ -145,7 +145,7 @@ void sendStatusUpdates() {
 		{
 			lastRefreshTime = millis();
 			updateStatus();
-			bus.send(ID_HAL100, (char *)&status, sizeof(status));
+			bus.send_packet_blocking(ID_HAL100, (char *)&status, sizeof(status));
 		}
 }
 
