@@ -1,17 +1,18 @@
 // Motor 1 = Ch1 = set 1 = Stepper 1 = "L" Motor
-// Motor 2 = Ch2 = set 2 = Stepper 2 = "C" Motor
+// Motor 2 = Ch2 = set 2 = Stepper 2 = "C1" Motor "Cold"
+// Motor 3 = Ch3 = set 3 = Stepper 3 = "C2 Motor "Hot"
 // Motor C: 200 steps 360 degrees revolution (no gear). In quater-step mode 800 steps 360 degrees revolution (no gear). 
 // Measured 2964 steps 360 degrees revolution.
 
-#include "proto/device_id.h"
-#include <AccelStepper.h>   // Accel Stepper library
+#include "proto/device_id.h"  // communication protocol device ID 
+#include <AccelStepper.h>     / Accel Stepper library
 
-#define PJON_ID ID_MECH
-#include "proto/common.h"
+#define PJON_ID ID_MECH       // PJON definition (communication protocol)
+#include "proto/common.h"     // communication protocol library
 
 AccelStepper stepper1 = AccelStepper(1, 3, 4);  // Custom pinout "L" - Step to D3, Dir to D4 (Default AccelStepper::FULL4WIRE (4 pins) on 2, 3, 4, 5)
-AccelStepper stepper2 = AccelStepper(1, 5, 6);  // Custom pinout "C" - Step to D5, Dir to D6 (Default AccelStepper::FULL4WIRE (4 pins) on 2, 3, 4, 5)
-AccelStepper stepper3 = AccelStepper(1, 7, 8);  // Custom pinout "C" - Step to D7, Dir to D8 (Default AccelStepper::FULL4WIRE (4 pins) on 2, 3, 4, 5)
+AccelStepper stepper2 = AccelStepper(1, 5, 6);  // Custom pinout "C1" - Step to D5, Dir to D6 (Default AccelStepper::FULL4WIRE (4 pins) on 2, 3, 4, 5)
+AccelStepper stepper3 = AccelStepper(1, 7, 8);  // Custom pinout "C2" - Step to D7, Dir to D8 (Default AccelStepper::FULL4WIRE (4 pins) on 2, 3, 4, 5)
 PROTO_MechStatus status;
 
 const byte ledPin = 13;     // Initialise LED for indication
