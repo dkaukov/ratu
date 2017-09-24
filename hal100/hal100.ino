@@ -123,6 +123,7 @@ void setup() {
 
   busInit(busReceiver);
   displayInitialScreen();
+  displaySWRvalue();
 
 }
 
@@ -417,6 +418,4 @@ void loop() {
     }
   }
   
- displaySWRvalue();
-
 }
