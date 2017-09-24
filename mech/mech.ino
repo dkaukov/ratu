@@ -131,6 +131,10 @@ void updateStatus() {
 	status.status.pos.lPos  = stepper1.currentPosition();
 	status.status.pos.c1Pos = stepper2.currentPosition();
 	status.status.pos.c2Pos = stepper3.currentPosition();
+	Serial.print("Value fwd=");
+	Serial.println(status.status.adc.fwd);
+	Serial.print("Value rfl=");
+	Serial.println(status.status.adc.rfl);
 }
 
 void sendStatusUpdates() {
