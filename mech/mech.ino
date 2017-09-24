@@ -30,7 +30,7 @@ void busReceiver(const TCommand *payload, const PJON_Packet_Info &packet_info) {
 			calibrate2(true);
 			break;
 		case channelC2:
-			calibrate2(true);
+			calibrate3(true);
 			break;
 		case channelL:
 			calibrate1(true);
