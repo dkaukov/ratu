@@ -142,7 +142,7 @@ void sendStatusUpdates() {
 		static unsigned long lastRefreshTime = 0;
 		if(millis() - lastRefreshTime >= REFRESH_INTERVAL)
 		{
-			lastRefreshTime += REFRESH_INTERVAL;
+			lastRefreshTime = millis();
 			updateStatus();
 			bus.send(ID_HAL100, (char *)&status, sizeof(status));
 		}
