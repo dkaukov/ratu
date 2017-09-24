@@ -53,7 +53,7 @@ typedef struct PROTO_CalParams {
 
 typedef struct PROTO_MechStatus {
 	uint8_t flags;
-	PROTO_PosParams pos;
+	uint16_t cnt;
 	PROTO_AdcValues adc;
 } PROTO_MechStatus;
 

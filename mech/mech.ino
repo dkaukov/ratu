@@ -131,13 +131,13 @@ void updateStatus() {
 	analogRead(fwdPwr);	status.status.adc.fwd = analogRead(fwdPwr);
 	analogRead(rflPwr);	status.status.adc.rfl = analogRead(rflPwr);
 	status.status.flags = stepper1.isRunning() || stepper1.isRunning() << 1 || stepper3.isRunning() << 2;
-	status.status.pos.lPos  = stepper1.currentPosition();
-	status.status.pos.c1Pos = stepper2.currentPosition();
-	status.status.pos.c2Pos = stepper3.currentPosition();
-	Serial.print("Value fwd=");
+	status.status.cnt++;
+	Serial.print("cnt=");
+	Serial.print(status.status.cnt);
+	Serial.print(", Value fwd=");
 	Serial.print(status.status.adc.fwd);
 	Serial.print(", Value rfl=");
-	Serial.println(status.status.adc.rfl);
+	Serial.print(status.status.adc.rfl);
 
 	float rfl = status.status.adc.rfl;
 	float fwd = status.status.adc.fwd;

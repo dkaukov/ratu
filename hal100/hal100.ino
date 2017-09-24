@@ -95,7 +95,9 @@ void busReceiver(const TCommand *payload, const PJON_Packet_Info &packet_info) {
 	switch (payload->id) {
 	case cmdStatus:
 
-		Serial.print("Value fwd=");
+		Serial.print("cnt=");
+		Serial.print(payload->status.cnt);
+		Serial.print(", Value fwd=");
 		Serial.print(payload->status.adc.fwd);
 		Serial.print(", Value rfl=");
 		Serial.print(payload->status.adc.rfl);
