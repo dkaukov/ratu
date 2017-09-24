@@ -47,6 +47,8 @@ void busReceiver(const TCommand *payload, const PJON_Packet_Info &packet_info) {
 
 void setup()
 {
+  ADCSRA = (ADCSRA & 0xf8) | 0x04;      // Fast ADC
+
   Serial.begin(9600);                   // Start Serial
   busInit(busReceiver);
 
@@ -126,8 +128,8 @@ void calibrate3(boolean run) {
 
 void updateStatus() {
 	status.id = cmdStatus;
-	status.status.adc.fwd = analogRead(fwdPwr);
-	status.status.adc.rfl = analogRead(rflPwr);
+	analogRead(fwdPwr);	status.status.adc.fwd = analogRead(fwdPwr);
+	analogRead(rflPwr);	status.status.adc.rfl = analogRead(rflPwr);
 	status.status.flags = stepper1.isRunning() || stepper1.isRunning() << 1 || stepper3.isRunning() << 2;
 	status.status.pos.lPos  = stepper1.currentPosition();
 	status.status.pos.c1Pos = stepper2.currentPosition();
