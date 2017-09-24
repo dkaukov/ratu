@@ -56,6 +56,7 @@ void setup()
   pinMode(ledPin, OUTPUT);              // Defines LED
   pinMode(optInpin1, INPUT);            //  Defines Optical command PIN "L"
   pinMode(optInpin2, INPUT);            //  Defines Optical command PIN "C"
+  pinMode(optInpin3, INPUT);            //  Defines Optical command PIN "C2"
 
   stepper1.setMaxSpeed(2000);           //  Set maximum roration speed for "L" Motor 1
   stepper1.setSpeed(500);               //  Set maximum calibration speed for "L" Motor 1
@@ -152,5 +153,6 @@ void loop() {
   busLoop();
   stepper1.run();
   stepper2.run();
+  stepper3.run();
   digitalWrite(ledPin, digitalRead(optInpin1));
 }
