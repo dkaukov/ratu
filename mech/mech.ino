@@ -155,4 +155,5 @@ void loop() {
   stepper2.run();
   stepper3.run();
   digitalWrite(ledPin, digitalRead(optInpin1));
+  sendStatusUpdates();
 }
