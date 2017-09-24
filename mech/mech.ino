@@ -10,6 +10,8 @@
 #define PJON_ID ID_MECH       // PJON definition (communication protocol)
 #include "proto/common.h"     // communication protocol library
 
+#include "adc.h"
+
 AccelStepper stepper1 = AccelStepper(1, 3, 4);  // Custom pinout "L" - Step to D3, Dir to D4 (Default AccelStepper::FULL4WIRE (4 pins) on 2, 3, 4, 5)
 AccelStepper stepper2 = AccelStepper(1, 5, 6);  // Custom pinout "C1" - Step to D5, Dir to D6 (Default AccelStepper::FULL4WIRE (4 pins) on 2, 3, 4, 5)
 AccelStepper stepper3 = AccelStepper(1, 7, 8);  // Custom pinout "C2" - Step to D7, Dir to D8 (Default AccelStepper::FULL4WIRE (4 pins) on 2, 3, 4, 5)
@@ -19,15 +21,6 @@ const byte ledPin = 13;     // Initialise LED for indication
 const byte optInpin1 = A1;  // Signal pin Optical Interruptor Motor 1
 const byte optInpin2 = A2;  // Signal pin Optical Interruptor Motor 2
 const byte optInpin3 = A3;  // Signal pin Optical Interruptor Motor 3 C2
-
-const byte fwdPwr = A5;     // Fwd signal from SWR sensor
-const byte rflPwr = A6;     // Rev. signal from SWR sensor
-const float adcFiltFactor = 0.99;
-
-volatile uint8_t adcPinCurr;
-volatile float fwdPwrVal = 0.0;
-volatile float rflPwrVal = 0.0;
-
 
 void busReceiver(const TCommand *payload, const PJON_Packet_Info &packet_info) {
 	switch (payload->id) {
@@ -52,36 +45,10 @@ void busReceiver(const TCommand *payload, const PJON_Packet_Info &packet_info) {
 	}
 }
 
-// ADC complete ISR
-ISR (ADC_vect) {
-  if (adcPinCurr == fwdPwr) {
-	  fwdPwrVal = (1 - adcFiltFactor) * ADC + fwdPwrVal * adcFiltFactor;
-	  adcPinCurr = rflPwr;
-  }
-  if (adcPinCurr == rflPwr) {
-  	  rflPwrVal = (1 - adcFiltFactor) * ADC + rflPwrVal * adcFiltFactor;
-  	  adcPinCurr = fwdPwr;
-    }
-  ADMUX =  bit(REFS0) | (adcPinCurr & 0x07);
-  ADCSRA |= bit(ADSC) | bit(ADIE);
-}
-
-void setup()
-{
-  ADCSRA = bit(ADEN);                   // turn ADC on
-  ADCSRA &= ~(bit(ADPS0) |
-		  bit(ADPS1) |
-		  bit(ADPS2));                  // clear prescaler bits
-  ADCSRA |= bit(ADPS2);                 //  16
-  adcPinCurr = fwdPwr;
-  ADMUX  =  bit(REFS0) | (adcPinCurr & 0x07);
-  ADCSRA |= bit(ADSC) | bit(ADIE);
-
+void setup() {
   Serial.begin(115200);                 // Start Serial
   busInit(busReceiver);
-
-  pinMode(fwdPwr, INPUT);
-  pinMode(rflPwr, INPUT);
+  adcInit();
 
   pinMode(ledPin, OUTPUT);              // Defines LED
   pinMode(optInpin1, INPUT);            //  Defines Optical command PIN "L"
@@ -155,8 +122,8 @@ void calibrate3(boolean run) {
 }
 
 void updateStatus() {
-	status.adc.fwd = round(fwdPwrVal);
-	status.adc.rfl = round(rflPwrVal);
+	status.adc.fwd = fwdPwrVal;
+	status.adc.rfl = rflPwrVal;
 	status.flags = stepper1.isRunning() || stepper1.isRunning() << 1 || stepper3.isRunning() << 2;
 	status.cnt++;
 }
@@ -174,6 +141,7 @@ void sendStatusUpdates() {
 
 void loop() {
   busLoop();
+  adcLoop();
   stepper1.run();
   stepper2.run();
   stepper3.run();
