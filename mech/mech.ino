@@ -49,7 +49,7 @@ void setup()
 {
   ADCSRA = (ADCSRA & 0xf8) | 0x04;      // Fast ADC
 
-  Serial.begin(9600);                   // Start Serial
+  Serial.begin(115200);                   // Start Serial
   busInit(busReceiver);
 
   pinMode(fwdPwr, INPUT);
@@ -135,15 +135,15 @@ void updateStatus() {
 	status.status.pos.c1Pos = stepper2.currentPosition();
 	status.status.pos.c2Pos = stepper3.currentPosition();
 	Serial.print("Value fwd=");
-	Serial.println(status.status.adc.fwd);
-	Serial.print("Value rfl=");
+	Serial.print(status.status.adc.fwd);
+	Serial.print(", Value rfl=");
 	Serial.println(status.status.adc.rfl);
 
 	float rfl = status.status.adc.rfl;
 	float fwd = status.status.adc.fwd;
 	float p = sqrt(rfl / fwd);
 	float valueSWR = (1 + p) / (1 - p);
-	Serial.print("Value SWR=");
+	Serial.print(", Value SWR=");
 	Serial.println(valueSWR);
 
 }

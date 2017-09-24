@@ -96,22 +96,22 @@ void busReceiver(const TCommand *payload, const PJON_Packet_Info &packet_info) {
 	case cmdStatus:
 
 		Serial.print("Value fwd=");
-		Serial.println(payload->status.adc.fwd);
-		Serial.print("Value rfl=");
-		Serial.println(payload->status.adc.rfl);
+		Serial.print(payload->status.adc.fwd);
+		Serial.print(", Value rfl=");
+		Serial.print(payload->status.adc.rfl);
 
 		float rfl = payload->status.adc.rfl;
 		float fwd = payload->status.adc.fwd;
 		float p = sqrt(rfl / fwd);
 		valueSWR = (1 + p) / (1 - p);
-		Serial.print("Value SWR=");
+		Serial.print(", Value SWR=");
 		Serial.println(valueSWR);
 		break;
 	}
 }
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   TFTscreen.begin();                                // initialise TFT screen
   TFTscreen.background(0, 20, 30);                  // clear the screen with a RGB background
