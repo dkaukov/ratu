@@ -141,11 +141,15 @@ void displayInitialScreen() {                      // displays "Wait Calibrating
   // Displays L
   TFTscreen.stroke(0, 255, 0);                      // set the font color
   TFTscreen.setTextSize(2);                         // set the font size 2
-  TFTscreen.text("Ln", 5, 40);                     // write the text to coordinates  
-  // Displays C
+  TFTscreen.text("L", 5, 40);                     // write the text to coordinates  
+  // Displays C1
   TFTscreen.stroke(0, 255, 0);                      // set the font color             
   TFTscreen.setTextSize(2);                         // set the font size 2
-  TFTscreen.text("Cn", 5, 60);                     // write the text to coordinates
+  TFTscreen.text("C1", 5, 60);                     // write the text to coordinates
+  // Displays C2
+  TFTscreen.stroke(0, 255, 0);                      // set the font color             
+  TFTscreen.setTextSize(2);                         // set the font size 2
+  TFTscreen.text("C2", 5, 80);                     // write the text to coordinates  
 
   keypad.addEventListener(keypadEvent);             //add an event listener for this keypad
 }
