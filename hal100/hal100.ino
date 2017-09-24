@@ -42,6 +42,7 @@ char tuningFreq[6];
 char key;
 char DisplayValueC[5];
 char DisplayValueL[5];
+char DisplayValueSWR[5];
 char input; //buffer for input characters for calculations
 // char dataPrintout[10];
 
@@ -122,6 +123,8 @@ void setup() {
 
   busInit(busReceiver);
   displayInitialScreen();
+  displaySWRvalue();
+
 }
 
 void displayInitialScreen() {                      // displays "Wait Calibrating at start. To be linked to Motors "L" and "C" calibration process
@@ -131,6 +134,10 @@ void displayInitialScreen() {                      // displays "Wait Calibrating
   TFTscreen.text("SET", 5, 117);                    // write the text to coordinates
   TFTscreen.setTextSize(2);
   TFTscreen.text("f:", 25, 110);
+  // Displays SWR
+  TFTscreen.stroke(0, 255, 0);                      // set the font color
+  TFTscreen.setTextSize(2);                         // set the font size 2
+  TFTscreen.text("SWR", 5, 15);                     // write the text to coordinates 
   // Displays L
   TFTscreen.stroke(0, 255, 0);                      // set the font color
   TFTscreen.setTextSize(2);                         // set the font size 2
@@ -142,6 +149,13 @@ void displayInitialScreen() {                      // displays "Wait Calibrating
 
   keypad.addEventListener(keypadEvent);             //add an event listener for this keypad
 }
+
+void displaySWRvalue() {
+    EraseDisplaySWR();
+    displaySWR();
+}
+
+
 
 void SetFrequencyStage1() {
 	// STAGE 1 tuning process
@@ -217,6 +231,19 @@ void eraseEnteredFrequency () {               // erase frequency value at the bo
   TFTscreen.setTextSize(2);
   TFTscreen.stroke(0, 20, 30);
   TFTscreen.text(enteredFreq, 50, 110);
+}
+
+void displaySWR() {                                         // display SWR values
+  dtostrf(valueSWR, 5, 2, DisplayValueSWR);
+  TFTscreen.stroke(0, 255, 0);
+  TFTscreen.setTextSize(2);
+  TFTscreen.text(DisplayValueSWR, 40, 15);
+}
+
+void EraseDisplaySWR() {                                   // erase display SWR values
+  TFTscreen.stroke(0, 20, 30);
+  TFTscreen.setTextSize(2);
+  TFTscreen.text(DisplayValueSWR, 40, 15);
 }
 
 void displayL() {                                         // display L values
