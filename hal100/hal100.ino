@@ -123,7 +123,6 @@ void setup() {
 
   busInit(busReceiver);
   displayInitialScreen();
-  displaySWRvalue();
 
 }
 
@@ -157,6 +156,7 @@ void displayInitialScreen() {                      // displays "Wait Calibrating
 void displaySWRvalue() {
     EraseDisplaySWR();
     displaySWR();
+    delay(1000);
 }
 
 
@@ -416,20 +416,7 @@ void loop() {
       TFTscreen.text(enteredFreq, 50, 110);
     }
   }
-
-  //                                                  print serial to TFT - reserved for future use
-  //  if (Serial.available()) {
-  //    char key = Serial.read();
-  //    String serialData = String(key);
-  //    serialData.toCharArray(dataPrintout, 10);
-  //    TFTscreen.stroke(255, 255, 0);
-  //    TFTscreen.setTextSize(2);
-  //    TFTscreen.text(dataPrintout, 50, 70);
-  //    // wait for 1s
-  //    delay(1000);
-  //    // erase the text
-  //    TFTscreen.stroke(0, 20, 30);
-  //    TFTscreen.text(dataPrintout, 50, 70);
-  //  }
+  
+ displaySWRvalue();
 
 }
