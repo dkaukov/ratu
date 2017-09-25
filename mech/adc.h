@@ -16,7 +16,7 @@ uint16_t rflPwrVal = 0;
 
 inline void adcStartconversion(uint8_t pin) {
   ADMUX  =  bit(REFS0) | ((pin - 14) & 0x07);
-  ADCSRA |= bit(ADSC);
+  sbi(ADCSRA, ADSC);
 }
 
 inline uint8_t adcMuxPin() {
