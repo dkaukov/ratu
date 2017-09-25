@@ -20,7 +20,7 @@ inline void adcStartconversion(uint8_t pin) {
 }
 
 inline uint8_t adcMuxPin() {
-  return ADMUX & 0x07;
+  return (ADMUX & 0x07) + 14;
 }
 
 inline void adcInit() {
