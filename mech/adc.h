@@ -57,7 +57,7 @@ inline void adcLoop() {
   if(isAdcConversionFinished()) {
     if (adcMuxPin() == fwdPwrPin) {
       fwdPwrVal = adcGetForwardVoltage();
-      adcStartconversion(rflPwrVal);
+      adcStartconversion(rflPwrPin);
     } else {
       rflPwrVal = adcGetReflectedVoltage();
       adcStartconversion(fwdPwrPin);
