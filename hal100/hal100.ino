@@ -106,11 +106,12 @@ void busReceiver(const TCommand *payload, const PJON_Packet_Info &packet_info) {
 
 		float rfl = payload->status.adc.rfl;
 		float fwd = payload->status.adc.fwd;
-		float p = sqrt(rfl / fwd);
+//		float p = sqrt(rfl / fwd);
+    float p = (rfl / fwd);
 		valueSWR = (1 + p) / (1 - p);
 		Serial.print(", Value SWR=");
 		Serial.println(valueSWR);
-    displaySWRvalue();
+   displaySWRvalue();
 
 		break;
 	}
