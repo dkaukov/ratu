@@ -123,7 +123,13 @@ void calibrate3(boolean run) {
 
 void updateStatus() {
 	status.adc.fwd = fwdPwrVal;
+	if (status.adc.fwd > diodeDropVal) {
+	  status.adc.fwd += diodeDropVal;
+	}
 	status.adc.rfl = rflPwrVal;
+  if (status.adc.rfl > diodeDropVal) {
+    status.adc.rfl += diodeDropVal;
+  }
 	status.flags = stepper1.isRunning() || stepper1.isRunning() << 1 || stepper3.isRunning() << 2;
 	status.cnt++;
 }

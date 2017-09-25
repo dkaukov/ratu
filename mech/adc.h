@@ -8,11 +8,13 @@
 #ifndef ADC_H_
 #define ADC_H_
 
-const byte fwdPwrPin = A5;     // Fwd signal from SWR sensor
-const byte rflPwrPin = A6;     // Rev. signal from SWR sensor
+const byte fwdPwrPin    = A5;     // Fwd signal from SWR sensor
+const byte rflPwrPin    = A6;     // Rev. signal from SWR sensor
+const byte diodeDropPin = A7;
 
 uint16_t fwdPwrVal = 0;
 uint16_t rflPwrVal = 0;
+uint16_t diodeDropVal = 0;
 
 inline void adcStartconversion(uint8_t pin) {
   ADMUX  =  bit(REFS0) | ((pin - A0) & 0x07);
@@ -53,17 +55,28 @@ int16_t adcGetReflectedVoltage(){
   return lpf;
 }
 
+int16_t adcDiodeDropVoltage(){
+  static int16_t lpf;
+  uint8_t low, high;
+  low  = ADCL;  high = ADCH;
+  int16_t val = (((high << 8) | low) << 4);
+  lpf += (val -  lpf) >> 2;
+  return lpf;
+}
+
 inline void adcLoop() {
   if(isAdcConversionFinished()) {
     if (adcMuxPin() == fwdPwrPin) {
       fwdPwrVal = adcGetForwardVoltage();
       adcStartconversion(rflPwrPin);
-    } else {
+    } else if (adcMuxPin() == rflPwrPin) {
       rflPwrVal = adcGetReflectedVoltage();
+      adcStartconversion(diodeDropPin);
+    } else {
+      diodeDropVal = adcDiodeDropVoltage();
       adcStartconversion(fwdPwrPin);
     }
   }
 }
-
 
 #endif /* ADC_H_ */
