@@ -110,6 +110,7 @@ void busReceiver(const TCommand *payload, const PJON_Packet_Info &packet_info) {
 		valueSWR = (1 + p) / (1 - p);
 		Serial.print(", Value SWR=");
 		Serial.println(valueSWR);
+    displaySWRvalue();
 
 		break;
 	}
@@ -123,7 +124,7 @@ void setup() {
 
   busInit(busReceiver);
   displayInitialScreen();
-  displaySWRvalue();
+  
 
 }
 
@@ -137,7 +138,7 @@ void displayInitialScreen() {                      // displays "Wait Calibrating
   // Displays SWR
   TFTscreen.stroke(0, 255, 0);                      // set the font color
   TFTscreen.setTextSize(2);                         // set the font size 2
-  TFTscreen.text("SWR", 5, 15);                     // write the text to coordinates 
+  TFTscreen.text("SWR", 5, 10);                     // write the text to coordinates 
   // Displays L
   TFTscreen.stroke(0, 255, 0);                      // set the font color
   TFTscreen.setTextSize(2);                         // set the font size 2
@@ -153,14 +154,6 @@ void displayInitialScreen() {                      // displays "Wait Calibrating
 
   keypad.addEventListener(keypadEvent);             //add an event listener for this keypad
 }
-
-void displaySWRvalue() {
-    EraseDisplaySWR();
-    displaySWR();
-    delay(1000);
-}
-
-
 
 void SetFrequencyStage1() {
 	// STAGE 1 tuning process
@@ -179,8 +172,8 @@ void SetFrequencyStage1() {
 void SetFrequency() {                               // when # pressed - sets frequency value at the top of the screen
   // Pre-STAGE 1 (coarse tuning process) cleanups and displays
   eraseFreqTopScreen();                             // clear previously entered drequesncy at display top
+  eraseEnteredFrequency();                          // clear entered frequency at display bottom  
   displayFreqTopScreen();                           // display desired frequesncy at display top
-  eraseEnteredFrequency();                          // clear entered frequency at display bottom
   SetFrequencyStage1();
 }
 
@@ -212,8 +205,8 @@ void incCCorr(float diff) {
 
 void eraseFreqTopScreen() {                      // erases frequency value from top of display
   TFTscreen.stroke(0, 20, 30);
-  TFTscreen.setTextSize(4);
-  TFTscreen.text(tuningFreq, 10, 10);
+  TFTscreen.setTextSize(2);
+  TFTscreen.text(tuningFreq, 50, 110);
   TuningFreqString = "";
 }
 
@@ -222,14 +215,14 @@ void displayFreqTopScreen() {                   // shows frequency value at top 
   TuningFreqString.toCharArray(tuningFreq, 6);
   EnteredFreqString = "";
   TFTscreen.stroke(255, 255, 0);
-  TFTscreen.setTextSize(4);
-  TFTscreen.text(tuningFreq, 10, 10);
+  TFTscreen.setTextSize(2);
+  TFTscreen.text(tuningFreq, 50, 110);
 }
 
 void displayTunedFreqTopScreen() {             // Display tuningFreq at the top of the screen in "green tuned mode"
   TFTscreen.stroke(0, 255, 0);
-  TFTscreen.setTextSize(4);
-  TFTscreen.text(tuningFreq, 10, 10);
+  TFTscreen.setTextSize(2);
+  TFTscreen.text(tuningFreq, 50, 110);
 }
 
 void eraseEnteredFrequency () {               // erase frequency value at the botton of the screen
@@ -238,17 +231,22 @@ void eraseEnteredFrequency () {               // erase frequency value at the bo
   TFTscreen.text(enteredFreq, 50, 110);
 }
 
+void displaySWRvalue() {                                    // process to display SWR values
+    EraseDisplaySWR();
+    displaySWR();
+}
+
 void displaySWR() {                                         // display SWR values
   dtostrf(valueSWR, 5, 2, DisplayValueSWR);
   TFTscreen.stroke(0, 255, 0);
   TFTscreen.setTextSize(2);
-  TFTscreen.text(DisplayValueSWR, 40, 15);
+  TFTscreen.text(DisplayValueSWR, 40, 10);
 }
 
 void EraseDisplaySWR() {                                   // erase display SWR values
   TFTscreen.stroke(0, 20, 30);
   TFTscreen.setTextSize(2);
-  TFTscreen.text(DisplayValueSWR, 40, 15);
+  TFTscreen.text(DisplayValueSWR, 40, 10);
 }
 
 void displayL() {                                         // display L values
@@ -403,6 +401,7 @@ void keypadEvent(KeypadEvent eKey) {
 
 void loop() {
   busLoop();
+
   key = keypad.getKey();
 
   if (key != NO_KEY && (key == '1' || key == '2' || key == '3' || key == '4' || key == '5' || key == '6' || key == '7' || key == '8' || key == '9' || key == '0'))
