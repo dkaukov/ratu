@@ -15,12 +15,12 @@ uint16_t fwdPwrVal = 0;
 uint16_t rflPwrVal = 0;
 
 inline void adcStartconversion(uint8_t pin) {
-  ADMUX  =  bit(REFS0) | ((pin - 14) & 0x07);
+  ADMUX  =  bit(REFS0) | ((pin - A0) & 0x07);
   sbi(ADCSRA, ADSC);
 }
 
 inline uint8_t adcMuxPin() {
-  return ADMUX & 0x07;
+  return (ADMUX & 0x07) + A0;
 }
 
 inline void adcInit() {
@@ -57,7 +57,7 @@ inline void adcLoop() {
   if(isAdcConversionFinished()) {
     if (adcMuxPin() == fwdPwrPin) {
       fwdPwrVal = adcGetForwardVoltage();
-      adcStartconversion(rflPwrVal);
+      adcStartconversion(rflPwrPin);
     } else {
       rflPwrVal = adcGetReflectedVoltage();
       adcStartconversion(fwdPwrPin);

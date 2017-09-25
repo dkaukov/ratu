@@ -12,15 +12,15 @@
 #define PROTO_COMMON_H_
 
 
-#define PJON_MAX_PACKETS 		4
-#define PJON_PACKET_MAX_LENGTH 	30
+#define PJON_MAX_PACKETS        4
+#define PJON_PACKET_MAX_LENGTH  30
 
 #define PJON_INCLUDE_SWBB
-#define PJON_INCLUDE_ASYNC_ACK 	false
-#define SWBB_MODE 				1
-#define SWBB_RESPONSE_TIMEOUT 	15000
-#define SWBB_BACK_OFF_DEGREE	4
-#define SWBB_MAX_ATTEMPTS		20
+#define PJON_INCLUDE_ASYNC_ACK 	true
+#define SWBB_MODE               1
+#define SWBB_RESPONSE_TIMEOUT   15000
+#define SWBB_BACK_OFF_DEGREE    4
+#define SWBB_MAX_ATTEMPTS       20
 
 #include <PJON.h>
 
@@ -109,7 +109,7 @@ void __busErrorHandler(uint8_t code, uint8_t data) {
 inline void busInit(PROTO_Receiver rcv) {
 	bus.strategy.set_pin(2);
 	bus.set_receiver(__busReceiver);
-	bus.set_asynchronous_acknowledge(false);
+	bus.set_asynchronous_acknowledge(true);
 	bus.set_error(__busErrorHandler);
 	__rcv = rcv;
 }
