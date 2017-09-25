@@ -56,15 +56,15 @@ void setup() {
   pinMode(optInpin3, INPUT);            //  Defines Optical command PIN "C2"
 
   stepper1.setMaxSpeed(2000);           //  Set maximum roration speed for "L" Motor 1
-  stepper1.setSpeed(500);               //  Set maximum calibration speed for "L" Motor 1
+  stepper1.setSpeed(1500);               //  Set maximum calibration speed for "L" Motor 1
   stepper1.setAcceleration(2000);       //  Set maximum acceleration for "L" Motor 1
 
   stepper2.setMaxSpeed(2000);           //  Set maximum roration speed for "C" Motor 2
-  stepper2.setSpeed(500);               //  Set maximum calibration speed for "C" Motor 2
+  stepper2.setSpeed(1000);               //  Set maximum calibration speed for "C" Motor 2
   stepper2.setAcceleration(2000);       //  Set maximum acceleration for "C" Motor 2
 
   stepper3.setMaxSpeed(2000);           //  Set maximum roration speed for "C" Motor 3
-  stepper3.setSpeed(500);               //  Set maximum calibration speed for "C" Motor 3
+  stepper3.setSpeed(1000);               //  Set maximum calibration speed for "C" Motor 3
   stepper3.setAcceleration(2000);       //  Set maximum acceleration for "C" Motor 3
 
   stepper1.setCurrentPosition(0);       // Set "Zero" position "L" Motor 1
@@ -78,7 +78,7 @@ void setup() {
 // Calibration process for "L" Motor 1
 void calibrate1(boolean run) {
   long oldPosition = stepper1.currentPosition();
-  stepper1.setSpeed(-600);
+  stepper1.setSpeed(-1500);
   while (digitalRead(optInpin1) == LOW) {
     stepper1.runSpeed();
     busLoop();
