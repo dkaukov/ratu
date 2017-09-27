@@ -18,6 +18,11 @@
   https://www.jaycar.com.au/128x128-lcd-screen-module-for-arduino/p/XC4629
   http://www.arduino.cc/en/Tutorial/TFTDisplayText
 
+
+Motor 1 = "L" Motor
+Motor 2 = "C1" Motor "Cold"
+Motor 3 = "C2 Motor "Hot"
+
 */
 #include "proto/device_id.h"
 #include <TFT.h>    // Arduino LCD library
@@ -40,7 +45,8 @@ TFT TFTscreen = TFT(cs, dc, rst);
 char enteredFreq[6];
 char tuningFreq[6];
 char key;
-char DisplayValueC[5];
+char DisplayValueC1[5];
+char DisplayValueC2[5];
 char DisplayValueL[5];
 char DisplayValueSWR[5];
 char input; //buffer for input characters for calculations
@@ -50,10 +56,11 @@ float tuningFreqCalc = 0;   // float for value C calculation
 float KHz;                  // KHz constant
 float PlanckTime;           // Planck constant
 float pi;                   // π constant
-float valueC = 0;           // calculated value C float
+float valueC1 = 0;           // calculated value C float
 float valueCEffective = 0;  // calculated value C float
 float valueL = 0;           // calculated value L float
-float valueCorr = 0;        // calculated value C float
+float valueC1Corr = 0;      // calculated value C1 float
+float valueC2Corr = 0;      // calculated value C1 float
 float valueLcorr = 0;       // calculated value L float
 float Cmult;                // constant multiplier to calculate C value
 float Lmult;                // constant multiplier to calculate L value
@@ -70,18 +77,23 @@ String DisplayValueLstring;
 int i;
 
 
-// Keypad code start
+// --- Keypad code start ---
 const byte ROWS = 5; // Five rows
 const byte COLS = 4; // Four columns
 // Define the Keymap
 char keys[ROWS][COLS] = {
-  {'S', '1', '2', '3'}, // ROW0-pin5      Buttons association 1=1 2=2 3=3 4=4 5=5 6=6 7=7 8=8 9=9 0=0 *=Led OFF #=Led ON
+// Buttons association 1=1 2=2 3=3 4=4 5=5 6=6 7=7 8=8 9=9 0=0 *=Led OFF #=Led ON
+// TOP Buttons  C c L l
+//Buttons in middle H U D S
+
+// COL0-pin1, COL1-pin2, COL2-pin3, COL3-pin4 
+  {'S', '1', '2', '3'}, // ROW0-pin5      
   {'K', '4', '5', '6'}, // ROW1-pin6
-  {'U', '7', '8', '9'}, // ROW2-pin7      TOP Buttons  C c L l
+  {'U', '7', '8', '9'}, // ROW2-pin7      
   {'D', '*', '0', '#'}, // ROW3-pin8
-  {'L', 'l', 'C', 'c'}  // ROW4-pin9      Buttons in middle H U D S
+  {'c', 'C', 'h', 'H'}  // ROW4-pin9
+       
 };
-// COL0-pin1, COL1-pin2, COL2-pin3, COL3-pin4
 
 // Connect keypad ROW0 Pad pin ->> 5=30 <<- pin Mega, ROW1 6=32, ROW2 7=23, ROW3 8=25, ROW4 9=27
 byte rowPins[ROWS] = { 30, 32, 23, 25, 27 };
@@ -90,7 +102,7 @@ byte colPins[COLS] = { 22, 24, 26, 28 };
 
 // Create the Keypad
 Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
-// end of Keypad code
+// --- end of Keypad code ---
 
 void busReceiver(const TCommand *payload, const PJON_Packet_Info &packet_info) {
 	switch (payload->id) {
@@ -111,7 +123,7 @@ void busReceiver(const TCommand *payload, const PJON_Packet_Info &packet_info) {
 		valueSWR = (1 + p) / (1 - p);
 		Serial.print(", Value SWR=");
 		Serial.println(valueSWR);
-   displaySWRvalue();
+        displaySWRvalue();
 
 		break;
 	}
@@ -164,8 +176,8 @@ void SetFrequencyStage1() {
 	calculateL();                                     // calculate L value at given frequency and C value
 	calculateStepsL();                                // calculate steps needed to move C to value L
 	LmoveStage1();                                    // send command to nano to move motor "L" to L step value
-	EraseDisplayC(), EraseDisplayL();                 // clear previous values L and C at display
-	displayC(), displayL();                           // display current values L and C at display
+	EraseDisplayC1(), EraseDisplayL();                 // clear previous values L and C at display
+	displayC1(), displayL();                           // display current values L and C at display
 	mechSetPosition(round (valueRotateL), round (valueRotateC1), round (valueRotateC2));
 	// End STAGE 1 tuning process
 }
@@ -180,13 +192,24 @@ void SetFrequency() {                               // when # pressed - sets fre
 
 
 void incL(float diff) {
-	valueRotateL = valueRotateL + diff;
-	mechSetPosition(round (valueRotateL), round (valueRotateC1), round (valueRotateC2));
+  EraseDisplayL();
+  valueRotateL = valueRotateL + diff;
+  displayL();
+  mechSetPosition(round (valueRotateL), round (valueRotateC1), round (valueRotateC2));
 }
 
-void incC(float diff) {
-	valueRotateC1 = valueRotateC1 + diff;
-	mechSetPosition(round (valueRotateL), round (valueRotateC1), round (valueRotateC2));
+void incC1(float diff) {
+  EraseDisplayC1();
+  valueRotateC1 = valueRotateC1 + diff;
+  displayC1();
+  mechSetPosition(round (valueRotateL), round (valueRotateC1), round (valueRotateC2));
+}
+
+void incC2(float diff) {
+  EraseDisplayC2();
+  valueRotateC2 = valueRotateC2 + diff;
+  displayC2();
+  mechSetPosition(round (valueRotateL), round (valueRotateC1), round (valueRotateC2));
 }
 
 void incLCorr(float diff) {
@@ -196,13 +219,19 @@ void incLCorr(float diff) {
     }
 }
 
-void incCCorr(float diff) {
+void incC1Corr(float diff) {
     if (tuningFreqCalc != 0.0) {
-      valueCorr = valueCorr + diff;
+      valueC1Corr = valueC1Corr + diff;
       SetFrequencyStage1();
     }
 }
 
+void incC2Corr(float diff) {
+    if (tuningFreqCalc != 0.0) {
+      valueC2Corr = valueC2Corr + diff;
+      SetFrequencyStage1();
+    }
+}
 
 void eraseFreqTopScreen() {                      // erases frequency value from top of display
   TFTscreen.stroke(0, 20, 30);
@@ -251,7 +280,7 @@ void EraseDisplaySWR() {                                   // erase display SWR 
 }
 
 void displayL() {                                         // display L values
-  dtostrf(valueRotateL, 5, 2, DisplayValueL);
+  dtostrf(valueRotateL, 5, 0, DisplayValueL);
   TFTscreen.stroke(0, 255, 0);
   TFTscreen.setTextSize(2);
   TFTscreen.text(DisplayValueL, 40, 40);
@@ -263,17 +292,30 @@ void EraseDisplayL() {                                   // erase display L valu
   TFTscreen.text(DisplayValueL, 40, 40);
 }
 
-void displayC() {                                       // display C values
-  dtostrf(valueRotateC1, 5, 0, DisplayValueC);
+void displayC1() {                                       // display C values
+  dtostrf(valueRotateC1, 5, 0, DisplayValueC1);
   TFTscreen.stroke(0, 255, 0);
   TFTscreen.setTextSize(2);
-  TFTscreen.text(DisplayValueC, 40, 60);
+  TFTscreen.text(DisplayValueC1, 40, 60);
 }
 
-void EraseDisplayC() {                                   // erase display C values
+void EraseDisplayC1() {                                   // erase display C values
   TFTscreen.stroke(0, 20, 20);
   TFTscreen.setTextSize(2);
-  TFTscreen.text(DisplayValueC, 40, 60);
+  TFTscreen.text(DisplayValueC1, 40, 60);
+}
+
+void displayC2() {                                       // display C values
+  dtostrf(valueRotateC2, 5, 0, DisplayValueC2);
+  TFTscreen.stroke(0, 255, 0);
+  TFTscreen.setTextSize(2);
+  TFTscreen.text(DisplayValueC2, 40, 80);
+}
+
+void EraseDisplayC2() {                                   // erase display C values
+  TFTscreen.stroke(0, 20, 20);
+  TFTscreen.setTextSize(2);
+  TFTscreen.text(DisplayValueC2, 40, 80);
 }
 
 void eraseFrequency() {                         // when * pressed - erases entered frequency bottom of the screen
@@ -315,9 +357,9 @@ void calculateC() {                             // Calculate value C from entere
   PlanckTime = 299792458;
   Cmult = 1.5;
   valueCEffective = PlanckTime / ( tuningFreqCalc * KHz ) * Cmult;
-  valueC = valueCEffective + valueCorr;
-  Serial.print("Value C pF=");
-  Serial.println(valueC);
+  valueC1 = valueCEffective + valueC1Corr;
+  Serial.print("Value C1 pF=");
+  Serial.println(valueC1);
 }
 
 void calculateL () {                            // Calculate "L" value from formula L=((1/(2*π*f*C))/(2*π*f))*1000000000000 (where f in KHz and C in pF)
@@ -337,7 +379,7 @@ void calculateStepsC() {                        // calculate needed steps for C
   Serial.println(pFtotalValue);
   float pFperStep = pFtotalValue / ( totalStepsC / 2 );
   Serial.println(pFperStep);
-  valueRotateC1 = ( valueC - pFmin ) / pFperStep;
+  valueRotateC1 = ( valueC1 - pFmin ) / pFperStep;
   Serial.print("steps C to rotate=");
   Serial.println(valueRotateC1);
 }
@@ -372,27 +414,33 @@ void keypadEvent(KeypadEvent eKey) {
         case '#':                           // submit frequesncy
           SetFrequency();
           break;
-        case 'C':                           // will be used for "C" motor move 1 step CCW
-          incCCorr(-1);
+        case 'c':                           // "C1 Cold" motor move 5 step CCW
+          incC1(-5);
           break;
-        case 'c':                           // will be used for "C" motor move 1 step CW
-          incCCorr(1);
+        case 'C':                           // "C1 Cold" motor move 5 step CW
+          incC1(5);          
           break;
-        case 'L':                           // used for "L" motor move 1 step CCW
-          incLCorr(-0.001);
+        case 'h':                           // "C2 Hot" motor move 5 step CCW
+          incC2(-5);
           break;
-        case 'l':                           // used for "L" motor move 1 step CW
-          incLCorr(0.001);
+        case 'H':                           // "C2 Hot" motor move 5 step CW
+          incC2(5);
+          break;
+        case 'D':                           // "L" motor move 100 step CCW
+          incL(-100.0);
+          break;
+        case 'U':                           // "L" motor move 100 step CW
+          incL(+100.0);
           break;
         case '*':                           // erase entered frequency
           eraseFrequency();
           break;
-        case 'U':                           // calibrate both motors
-          mechCalibrate(channelC1);
-          break;
-        case 'D':                           // calibrate both motors
-          mechCalibrate(channelL);
-          break;
+//        case 'U':                           // calibrate both motors
+//          mechCalibrate(channelC1);
+//          break;
+//        case 'D':                           // calibrate both motors
+//          mechCalibrate(channelL);
+//          break;
           
       }
   }
