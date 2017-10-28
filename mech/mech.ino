@@ -8,7 +8,6 @@
 #include <AccelStepper.h>     / Accel Stepper library
 
 #include <SoftwareSerial.h>
-SoftwareSerial pjonSerial(12, 11); // RX, TX
 
 #define PJON_ID ID_MECH       // PJON definition (communication protocol)
 #include "proto/common.h"     // communication protocol library
@@ -49,9 +48,8 @@ void busReceiver(const TCommand *payload, const PJON_Packet_Info &packet_info) {
 }
 
 void setup() {
-  Serial.begin(115200);                 // Start Serial
-  pjonSerial.begin(9600);
-  busInit(busReceiver, 2, &pjonSerial);
+  Serial.begin(9600);                    // Start Serial
+  busInit(busReceiver, 2, &Serial);
   adcInit();
 
   pinMode(ledPin, OUTPUT);              // Defines LED
@@ -76,7 +74,7 @@ void setup() {
   stepper3.setCurrentPosition(0);       // Set "Zero" position "C" Motor 3
   calibrate1(false);                    // Calibration function "L" Motor 1
   calibrate2(false);                    // Calibration function "C" Motor 2
-  calibrate3(false);                  // Calibration function "C" Motor 3
+  calibrate3(false);                    // Calibration function "C" Motor 3
 }
 
 // Calibration process for "L" Motor 1

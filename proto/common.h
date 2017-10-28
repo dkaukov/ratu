@@ -79,6 +79,7 @@ void __busReceiver(uint8_t *payload, uint16_t length,
 }
 
 void __busErrorHandler(uint8_t code, uint8_t data) {
+  /*
   if (code == PJON_CONNECTION_LOST) {
     Serial.print("Connection with device ID ");
     Serial.print(bus.packets[data].content[0], DEC);
@@ -102,11 +103,10 @@ void __busErrorHandler(uint8_t code, uint8_t data) {
     Serial.print("Device buffer full: ");
     Serial.println(data);
   }
+  */
 }
-;
 
-inline void busInit(PROTO_Receiver rcv, uint8_t enablePin,
-    Stream *serial_port) {
+inline void busInit(PROTO_Receiver rcv, uint8_t enablePin, Stream *serial_port) {
   bus.strategy.set_serial(serial_port);
   bus.strategy.set_enable_RS485_pin(enablePin);
   bus.set_receiver(__busReceiver);
