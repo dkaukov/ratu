@@ -76,13 +76,13 @@ void setup() {
   stepper3.setCurrentPosition(0);       // Set "Zero" position "C" Motor 3
   calibrate1(false);                    // Calibration function "L" Motor 1
   calibrate2(false);                    // Calibration function "C" Motor 2
-  //calibrate3(false);                  // Calibration function "C" Motor 3
+  calibrate3(false);                  // Calibration function "C" Motor 3
 }
 
 // Calibration process for "L" Motor 1
 void calibrate1(boolean run) {
   long oldPosition = stepper1.currentPosition();
-  stepper1.setSpeed(-1500);
+  stepper1.setSpeed(-2000);
   while (digitalRead(optInpin1) == LOW) {
     stepper1.runSpeed();
     busLoop();
@@ -97,7 +97,7 @@ void calibrate1(boolean run) {
 // Calibration process for "C" Motor 2
 void calibrate2(boolean run) {
   long oldPosition = stepper2.currentPosition();
-  stepper2.setSpeed(-600);
+  stepper2.setSpeed(-2000);
   while (digitalRead(optInpin2) == LOW) {
     stepper2.runSpeed();
     busLoop();
@@ -112,7 +112,7 @@ void calibrate2(boolean run) {
 // Calibration process for "C" Motor 3
 void calibrate3(boolean run) {
   long oldPosition = stepper3.currentPosition();
-  stepper3.setSpeed(-600);
+  stepper3.setSpeed(-2000);
   while (digitalRead(optInpin3) == LOW) {
     stepper3.runSpeed();
     busLoop();
