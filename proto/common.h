@@ -15,7 +15,7 @@
 
 #define PJON_MAX_PACKETS        5
 #define PJON_PACKET_MAX_LENGTH  35
-#define PJON_INCLUDE_ASYNC_ACK  true
+#define PJON_INCLUDE_ASYNC_ACK  false
 
 #define TS_BYTE_TIME_OUT      1300
 #define TS_COLLISION_DELAY    1000
@@ -116,7 +116,7 @@ inline void busInit(PROTO_Receiver rcv, uint8_t enablePin, Stream *serial_port) 
   bus.strategy.set_serial(serial_port);
   bus.strategy.set_enable_RS485_pin(enablePin);
   bus.set_receiver(__busReceiver);
-  bus.set_asynchronous_acknowledge(true);
+  bus.set_synchronous_acknowledge(true);
   bus.set_error(__busErrorHandler);
   __rcv = rcv;
 }
