@@ -17,7 +17,8 @@
 #define PJON_PACKET_MAX_LENGTH  35
 #define PJON_INCLUDE_ASYNC_ACK  true
 
-#define TS_BYTE_TIME_OUT      1500
+#define TS_BYTE_TIME_OUT      1300
+#define TS_COLLISION_DELAY    1000
 #define TS_RESPONSE_TIME_OUT  20000
 #define TS_BACK_OFF_DEGREE    4
 #define TS_MAX_ATTEMPTS       4
