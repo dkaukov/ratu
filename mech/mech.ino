@@ -7,6 +7,9 @@
 #include "proto/device_id.h"  // communication protocol device ID 
 #include <AccelStepper.h>     / Accel Stepper library
 
+#include <SoftwareSerial.h>
+SoftwareSerial pjonSerial(12, 11); // RX, TX
+
 #define PJON_ID ID_MECH       // PJON definition (communication protocol)
 #include "proto/common.h"     // communication protocol library
 
@@ -47,7 +50,8 @@ void busReceiver(const TCommand *payload, const PJON_Packet_Info &packet_info) {
 
 void setup() {
   Serial.begin(115200);                 // Start Serial
-  busInit(busReceiver);
+  pjonSerial.begin(9600);
+  busInit(busReceiver, 2, &pjonSerial);
   adcInit();
 
   pinMode(ledPin, OUTPUT);              // Defines LED
