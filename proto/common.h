@@ -17,10 +17,10 @@
 #define PJON_PACKET_MAX_LENGTH  35
 #define PJON_INCLUDE_ASYNC_ACK  true
 
-#define TS_BYTE_TIME_OUT      5000
+#define TS_BYTE_TIME_OUT      1500
 #define TS_RESPONSE_TIME_OUT  20000
 #define TS_BACK_OFF_DEGREE    4
-#define TS_MAX_ATTEMPTS       20
+#define TS_MAX_ATTEMPTS       4
 
 //#define PJON_INCLUDE_SWBB
 #define SWBB_MODE               1
