@@ -131,7 +131,7 @@ void busReceiver(const TCommand *payload, const PJON_Packet_Info &packet_info) {
 
 void setup() {
   Serial.begin(115200);
-  Serial2.begin(9600);
+  Serial2.begin(TS_PORT_BITRATE);
 
   TFTscreen.begin();                                // initialise TFT screen
   TFTscreen.background(0, 20, 30);                  // clear the screen with a RGB background

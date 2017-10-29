@@ -48,7 +48,7 @@ void busReceiver(const TCommand *payload, const PJON_Packet_Info &packet_info) {
 }
 
 void setup() {
-  Serial.begin(9600);                    // Start Serial
+  Serial.begin(TS_PORT_BITRATE);                    // Start Serial
   busInit(busReceiver, 2, &Serial);
   adcInit();
 
