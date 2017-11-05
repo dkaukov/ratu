@@ -7,8 +7,6 @@
 #include "proto/device_id.h"  // communication protocol device ID 
 #include <AccelStepper.h>     / Accel Stepper library
 
-#include <SoftwareSerial.h>
-
 #define PJON_ID ID_MECH       // PJON definition (communication protocol)
 #include "proto/common.h"     // communication protocol library
 
