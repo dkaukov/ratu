@@ -12,36 +12,36 @@
 
 #include "adc.h"
 
-AccelStepper stepper1 = AccelStepper(1, 3, 4);  // Custom pinout "L" - Step to D3, Dir to D4 (Default AccelStepper::FULL4WIRE (4 pins) on 2, 3, 4, 5)
-AccelStepper stepper2 = AccelStepper(1, 5, 6);  // Custom pinout "C1" - Step to D5, Dir to D6 (Default AccelStepper::FULL4WIRE (4 pins) on 2, 3, 4, 5)
-AccelStepper stepper3 = AccelStepper(1, 7, 8);  // Custom pinout "C2" - Step to D7, Dir to D8 (Default AccelStepper::FULL4WIRE (4 pins) on 2, 3, 4, 5)
+AccelStepper stepperL  = AccelStepper(1, 3, 4);  // Custom pinout "L" - Step to D3, Dir to D4 (Default AccelStepper::FULL4WIRE (4 pins) on 2, 3, 4, 5)
+AccelStepper stepperC1 = AccelStepper(1, 5, 6);  // Custom pinout "C1" - Step to D5, Dir to D6 (Default AccelStepper::FULL4WIRE (4 pins) on 2, 3, 4, 5)
+AccelStepper stepperC2 = AccelStepper(1, 7, 8);  // Custom pinout "C2" - Step to D7, Dir to D8 (Default AccelStepper::FULL4WIRE (4 pins) on 2, 3, 4, 5)
 PROTO_MechStatus status;
 uint8_t isAutoTune = 0;
 
 const byte ledPin = 13;     // Initialise LED for indication
-const byte optInpin1 = A1;  // Signal pin Optical Interruptor Motor 1
-const byte optInpin2 = A2;  // Signal pin Optical Interruptor Motor 2
-const byte optInpin3 = A3;  // Signal pin Optical Interruptor Motor 3 C2
+const byte optInpinL = A1;  // Signal pin Optical Interruptor Motor 1
+const byte optInpinC1 = A2;  // Signal pin Optical Interruptor Motor 2
+const byte optInpinC2 = A3;  // Signal pin Optical Interruptor Motor 3 C2
 
 void busReceiver(const TCommand *payload, const PJON_Packet_Info &packet_info) {
 	switch (payload->id) {
 	case cmdCalibrate:
 		switch (payload->cal.channel) {
 		case channelC1:
-			calibrate2(true);
+			calibrateC1(true);
 			break;
 		case channelC2:
-			calibrate3(true);
+			calibrateC2(true);
 			break;
 		case channelL:
-			calibrate1(true);
+			calibrateL(true);
 			break;
 		}
 		break;
 	case cmdSetPos:
-		stepper1.moveTo(stepper1.targetPosition() + payload->pos.lPos);
-		stepper2.moveTo(stepper2.targetPosition() + payload->pos.c1Pos);
-		stepper3.moveTo(stepper3.targetPosition() + payload->pos.c2Pos);
+		stepperL.moveTo(stepperL.targetPosition() + payload->pos.lPos);
+		stepperC1.moveTo(stepperC1.targetPosition() + payload->pos.c1Pos);
+		stepperC2.moveTo(stepperC2.targetPosition() + payload->pos.c2Pos);
 		break;
 	case cmdAutoTune:
 	  autoTune();
@@ -53,197 +53,120 @@ void busReceiver(const TCommand *payload, const PJON_Packet_Info &packet_info) {
 }
 
 void setup() {
-  Serial.begin(TS_PORT_BITRATE);                    // Start Serial
+  Serial.begin(TS_PORT_BITRATE);
   busInit(busReceiver, 2, &Serial);
   adcInit();
 
-  pinMode(ledPin, OUTPUT);              // Defines LED
-  pinMode(optInpin1, INPUT);            //  Defines Optical command PIN "L"
-  pinMode(optInpin2, INPUT);            //  Defines Optical command PIN "C"
-  pinMode(optInpin3, INPUT);            //  Defines Optical command PIN "C2"
+  pinMode(ledPin, OUTPUT);               //  Defines LED
+  pinMode(optInpinL, INPUT);             //  Defines Optical command PIN "L"
+  pinMode(optInpinC1, INPUT);            //  Defines Optical command PIN "C"
+  pinMode(optInpinC2, INPUT);            //  Defines Optical command PIN "C2"
 
-  stepper1.setMaxSpeed(2000);           //  Set maximum roration speed for "L" Motor 1
-  stepper1.setSpeed(1500);               //  Set maximum calibration speed for "L" Motor 1
-  stepper1.setAcceleration(2000);       //  Set maximum acceleration for "L" Motor 1
+  stepperL.setMaxSpeed(2000);            //  Set maximum roration speed for "L" Motor 1
+  stepperL.setSpeed(1500);               //  Set maximum calibration speed for "L" Motor 1
+  stepperL.setAcceleration(2000);        //  Set maximum acceleration for "L" Motor 1
 
-  stepper2.setMaxSpeed(2000);           //  Set maximum roration speed for "C" Motor 2
-  stepper2.setSpeed(1000);               //  Set maximum calibration speed for "C" Motor 2
-  stepper2.setAcceleration(2000);       //  Set maximum acceleration for "C" Motor 2
+  stepperC1.setMaxSpeed(2000);           //  Set maximum roration speed for "C" Motor 2
+  stepperC1.setSpeed(1000);              //  Set maximum calibration speed for "C" Motor 2
+  stepperC1.setAcceleration(2000);       //  Set maximum acceleration for "C" Motor 2
 
-  stepper3.setMaxSpeed(2000);           //  Set maximum roration speed for "C" Motor 3
-  stepper3.setSpeed(1000);               //  Set maximum calibration speed for "C" Motor 3
-  stepper3.setAcceleration(2000);       //  Set maximum acceleration for "C" Motor 3
+  stepperC2.setMaxSpeed(2000);           //  Set maximum roration speed for "C" Motor 3
+  stepperC2.setSpeed(1000);              //  Set maximum calibration speed for "C" Motor 3
+  stepperC2.setAcceleration(2000);       //  Set maximum acceleration for "C" Motor 3
 
-  stepper1.setCurrentPosition(0);       // Set "Zero" position "L" Motor 1
-  stepper2.setCurrentPosition(0);       // Set "Zero" position "C" Motor 2
-  stepper3.setCurrentPosition(0);       // Set "Zero" position "C" Motor 3
-  calibrate1(false);                    // Calibration function "L" Motor 1
-  calibrate2(false);                    // Calibration function "C" Motor 2
-  calibrate3(false);                    // Calibration function "C" Motor 3
-  stepper1.moveTo(3000);
-  stepper2.moveTo(10);
-  stepper3.moveTo(10);
-
+  stepperL.setCurrentPosition(0);        //  Set "Zero" position "L" Motor 1
+  stepperC1.setCurrentPosition(0);       //  Set "Zero" position "C" Motor 2
+  stepperC2.setCurrentPosition(0);       //  Set "Zero" position "C" Motor 3
+  calibrateL(false);                     //  Calibration function "L" Motor 1
+  calibrateC1(false);                    //  Calibration function "C" Motor 2
+  calibrateC2(false);                    //  Calibration function "C" Motor 3
+  stepperL.moveTo(3000);
+  stepperC1.moveTo(10);
+  stepperC2.moveTo(10);
 }
 
 void yeld() {
-  while (stepper1.isRunning() || stepper2.isRunning() || stepper3.isRunning()) {
+  while (stepperL.isRunning() || stepperC1.isRunning() || stepperC2.isRunning()) {
       busLoop();
       adcLoop();
       sendStatusUpdates();
-      stepper1.run();
-      stepper2.run();
-      stepper3.run();
+      stepperL.run();
+      stepperC1.run();
+      stepperC2.run();
   }
   adcCnt = 0;
-  while (adcCnt < 128) {
+  while (adcCnt < 64) {
     busLoop();
     adcLoop();
     sendStatusUpdates();
   }
 }
 
-void autoTune() {
-  if (fwdPwrVal == 0) {
-    return;
-  }
-  if (isAutoTune != 0) {
-      return;
-  }
-  isAutoTune = 1;
-  stepper2.moveTo(10);
-  stepper3.moveTo(10);
-  stepper1.setAcceleration(20000);
+void optimize(AccelStepper *chanel, int16_t step, int16_t hysteresis) {
   yeld();
   uint16_t prevSetepPwr = rflPwrVal;
-  int16_t step = 1000;
   while (step != 0) {
-    stepper1.move(step);
+    chanel->move(step);
     yeld();
-    if (prevSetepPwr < rflPwrVal) {
+    if (prevSetepPwr < (rflPwrVal + hysteresis)) {
       step = -(step >> 1);
     }
     prevSetepPwr = rflPwrVal;
+    if ((fwdPwrVal == 0) || (rflPwrVal == 0)) {
+      break;
+    }
   }
+}
 
-  yeld();
-  step = 20;
-  prevSetepPwr = rflPwrVal;
-  while (step != 0) {
-      stepper2.move(step);
-      yeld();
-      if (prevSetepPwr < rflPwrVal) {
-        step = -(step >> 1);
-      }
-      prevSetepPwr = rflPwrVal;
+void autoTune() {
+  if ((fwdPwrVal == 0) || (isAutoTune)) {
+    return;
   }
-
-  yeld();
-  step = 20;
-  prevSetepPwr = rflPwrVal;
-  while (step != 0) {
-      stepper3.move(step);
-      yeld();
-      if (prevSetepPwr < rflPwrVal) {
-        step = -(step >> 1);
-      }
-      prevSetepPwr = rflPwrVal;
-  }
+  isAutoTune = 1;
+  stepperC1.moveTo(10);
+  stepperC2.moveTo(10);
+  stepperL.setAcceleration(20000);
+  optimize(&stepperL, 1000, 0);
+  optimize(&stepperC1, 20, 0);
+  optimize(&stepperC2, 20, 0);
   isAutoTune = 0;
 }
 
 void fineTune() {
-  if (fwdPwrVal == 0) {
+  if ((fwdPwrVal == 0) || (isAutoTune)) {
     return;
   }
-  if (isAutoTune != 0) {
-      return;
-  }
   isAutoTune = 1;
-  yeld();
-  uint16_t prevSetepPwr = rflPwrVal;
-  int16_t step = 10;
-  yeld();
-  prevSetepPwr = rflPwrVal;
-  while (step != 0) {
-    stepper2.move(step);
-    yeld();
-    if (prevSetepPwr < rflPwrVal) {
-      step = -(step >> 1);
-    }
-    prevSetepPwr = rflPwrVal;
-  }
-
-  yeld();
-  step = 10;
-  prevSetepPwr = rflPwrVal;
-  while (step != 0) {
-    stepper3.move(step);
-    yeld();
-    if (prevSetepPwr < rflPwrVal) {
-      step = -(step >> 1);
-    }
-    prevSetepPwr = rflPwrVal;
-  }
-
-  yeld();
-  step = 10;
-  prevSetepPwr = rflPwrVal;
-  while (step != 0) {
-    stepper2.move(step);
-    yeld();
-    if (prevSetepPwr < rflPwrVal) {
-      step = -(step >> 1);
-    }
-    prevSetepPwr = rflPwrVal;
-  }
+  optimize(&stepperC1, 10, 0);
+  optimize(&stepperC2, 10, 0);
+  optimize(&stepperC1, 10, 0);
   isAutoTune = 0;
 }
 
-// Calibration process for "L" Motor 1
-void calibrate1(boolean run) {
-  long oldPosition = stepper1.currentPosition();
-  stepper1.setSpeed(-2000);
-  while (digitalRead(optInpin1) == LOW) {
-    stepper1.runSpeed();
+void calibrate(AccelStepper *chanel, uint8_t sensorPin, boolean run) {
+  long oldPosition = chanel->currentPosition();
+  chanel->setSpeed(-2000);
+  while (digitalRead(sensorPin) == LOW) {
+    chanel->runSpeed();
     busLoop();
   }
-  stepper1.stop();
-  stepper1.setCurrentPosition(0);
+  chanel->stop();
+  chanel->setCurrentPosition(0);
   if (run) {
-    stepper1.moveTo(oldPosition);
+    chanel->moveTo(oldPosition);
   }
 }
 
-// Calibration process for "C" Motor 2
-void calibrate2(boolean run) {
-  long oldPosition = stepper2.currentPosition();
-  stepper2.setSpeed(-2000);
-  while (digitalRead(optInpin2) == LOW) {
-    stepper2.runSpeed();
-    busLoop();
-  }
-  stepper2.stop();
-  stepper2.setCurrentPosition(0);
-  if (run) {
-    stepper2.moveTo(oldPosition);
-  }
+void inline calibrateL(boolean run) {
+  calibrate(&stepperL, optInpinL, run);
 }
 
-// Calibration process for "C" Motor 3
-void calibrate3(boolean run) {
-  long oldPosition = stepper3.currentPosition();
-  stepper3.setSpeed(-2000);
-  while (digitalRead(optInpin3) == LOW) {
-    stepper3.runSpeed();
-    busLoop();
-  }
-  stepper3.stop();
-  stepper3.setCurrentPosition(0);
-  if (run) {
-    stepper3.moveTo(oldPosition);
-  }
+void inline calibrateC1(boolean run) {
+  calibrate(&stepperC1, optInpinC1, run);
+}
 
+void inline calibrateC2(boolean run) {
+  calibrate(&stepperC2, optInpinC2, run);
 }
 
 void updateStatus() {
@@ -255,10 +178,10 @@ void updateStatus() {
   if (status.adc.rfl > diodeDropVal) {
     status.adc.rfl += diodeDropVal;
   }
-  status.pos.lPos = stepper1.currentPosition();
-  status.pos.c1Pos = stepper2.currentPosition();
-  status.pos.c2Pos = stepper3.currentPosition();
-  status.flags = stepper1.isRunning() | (stepper1.isRunning() << 1) | (stepper3.isRunning() << 2) | (isAutoTune << 3);
+  status.pos.lPos = stepperL.currentPosition();
+  status.pos.c1Pos = stepperC1.currentPosition();
+  status.pos.c2Pos = stepperC2.currentPosition();
+  status.flags = stepperL.isRunning() | (stepperL.isRunning() << 1) | (stepperC2.isRunning() << 2) | (isAutoTune << 3);
 	status.cnt++;
 }
 
@@ -276,9 +199,9 @@ void sendStatusUpdates() {
 void loop() {
   busLoop();
   adcLoop();
-  stepper1.run();
-  stepper2.run();
-  stepper3.run();
-  digitalWrite(ledPin, digitalRead(optInpin1));
+  stepperL.run();
+  stepperC1.run();
+  stepperC2.run();
+  digitalWrite(ledPin, digitalRead(optInpinL));
   sendStatusUpdates();
 }

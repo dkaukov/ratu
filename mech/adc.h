@@ -18,7 +18,7 @@ uint16_t adcCnt = 0;
 
 inline void adcStartconversion(uint8_t pin) {
   ADMUX  =  bit(REFS0) | ((pin - A0) & 0x07);
-  sbi(ADCSRA, ADSC);
+  bitSet(ADCSRA, ADSC);
 }
 
 inline uint8_t adcMuxPin() {
