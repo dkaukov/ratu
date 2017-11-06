@@ -13,7 +13,7 @@ const byte rflPwrPin    = A6;     // Rev. signal from SWR sensor
 
 uint16_t fwdPwrVal = 0;
 uint16_t rflPwrVal = 0;
-const uint16_t diodeDropVal = 161*2;
+const uint16_t diodeDropVal = 161 / 2;
 uint16_t adcCnt = 0;
 
 inline void adcStartconversion(uint8_t pin) {

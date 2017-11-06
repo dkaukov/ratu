@@ -258,7 +258,7 @@ void updateStatus() {
   status.pos.lPos = stepper1.currentPosition();
   status.pos.c1Pos = stepper2.currentPosition();
   status.pos.c2Pos = stepper3.currentPosition();
-  status.flags = stepper1.isRunning() || (stepper1.isRunning() << 1) || (stepper3.isRunning() << 2) || (isAutoTune << 3);
+  status.flags = stepper1.isRunning() | (stepper1.isRunning() << 1) | (stepper3.isRunning() << 2) | (isAutoTune << 3);
 	status.cnt++;
 }
 
