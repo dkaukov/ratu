@@ -13,16 +13,16 @@
 
 #define PJON_INCLUDE_TS
 
-#define PJON_MAX_PACKETS        5
-#define PJON_PACKET_MAX_LENGTH  35
+#define PJON_MAX_PACKETS        4
+#define PJON_PACKET_MAX_LENGTH  40
 #define PJON_INCLUDE_ASYNC_ACK  false
 
 #define TS_BITRATE_SCALER     3
-#define TS_BYTE_TIME_OUT      1300 / TS_BITRATE_SCALER
-#define TS_COLLISION_DELAY    1000 / TS_BITRATE_SCALER
+#define TS_BYTE_TIME_OUT      1200 / TS_BITRATE_SCALER
+#define TS_COLLISION_DELAY    2400 / TS_BITRATE_SCALER
 #define TS_RESPONSE_TIME_OUT  20000
 #define TS_BACK_OFF_DEGREE    4
-#define TS_MAX_ATTEMPTS       4
+#define TS_MAX_ATTEMPTS       3
 #define TS_PORT_BITRATE       9600 * TS_BITRATE_SCALER
 
 //#define PJON_INCLUDE_SWBB
@@ -41,7 +41,7 @@ enum {
 };
 
 enum {
-  cmdCalibrate, cmdSetPos, cmdStatus
+  cmdCalibrate, cmdSetPos, cmdStatus, cmdAutoTune, cmdFineTune
 };
 
 typedef struct PROTO_PosParams {
@@ -63,6 +63,7 @@ typedef struct PROTO_MechStatus {
   uint8_t flags;
   uint16_t cnt;
   PROTO_AdcValues adc;
+  PROTO_PosParams pos;
 } PROTO_MechStatus;
 
 typedef struct TCommand {
@@ -83,6 +84,7 @@ void __busReceiver(uint8_t *payload, uint16_t length,
     const PJON_Packet_Info &packet_info) {
   if (length == sizeof(TCommand) && __rcv != NULL) {
     __rcv((TCommand *) payload, packet_info);
+    bus.send_synchronous_acknowledge();
   }
 }
 
@@ -128,12 +130,12 @@ inline void busLoop() {
   bus.update();
 }
 
-inline uint16_t mechSetPosition(long l, long c1, long c2) {
+inline uint16_t mechSetPosition(int16_t l, int16_t c1, int16_t c2) {
   TCommand cmd = { .id = cmdSetPos };
   cmd.pos.lPos = l;
   cmd.pos.c1Pos = c1;
   cmd.pos.c2Pos = c2;
-  return bus.send_packet_blocking(ID_MECH, (char *) &cmd, sizeof(cmd));
+  return bus.send(ID_MECH, (char *) &cmd, sizeof(cmd));
 }
 
 inline uint16_t mechCalibrate(uint8_t ch) {
@@ -146,6 +148,16 @@ inline uint16_t halSendStatusUpdate(PROTO_MechStatus &status) {
   TCommand cmd = { .id = cmdStatus };
   cmd.status = status;
   return bus.send(ID_HAL100, (char *) &cmd, sizeof(cmd));
+}
+
+inline uint16_t mechAutoTune() {
+  TCommand cmd = { .id = cmdAutoTune };
+  return bus.send(ID_MECH, (char *) &cmd, sizeof(cmd));
+}
+
+inline uint16_t mechFineTune() {
+  TCommand cmd = { .id = cmdFineTune };
+  return bus.send(ID_MECH, (char *) &cmd, sizeof(cmd));
 }
 
 #endif /* PROTO_COMMON_H_ */

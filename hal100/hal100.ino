@@ -32,6 +32,12 @@ Motor 3 = "C2 Motor "Hot"
 #define PJON_ID ID_HAL100
 #include "proto/common.h"
 
+//Bell icon size: 16W*16H
+const unsigned char bell [] PROGMEM = {
+0x01, 0x80, 0x03, 0xc0, 0x0f, 0xf0, 0x1f, 0xf8, 0x1f, 0xf8, 0x1f, 0xf8, 0x3f, 0xfc, 0x3f, 0xfc,
+0x3f, 0xfc, 0x3f, 0xfc, 0x3f, 0xfc, 0x7f, 0xfe, 0x7f, 0xfe, 0xc3, 0xc3, 0xc3, 0xc3, 0x3f, 0xfc,
+};
+
 // TFT display CS, RS and RST pins definition for Mega2560
 #define cs   10
 #define dc   9
@@ -40,15 +46,18 @@ Motor 3 = "C2 Motor "Hot"
 // create an instance of the TFT library
 TFT TFTscreen = TFT(cs, dc, rst);
 
+boolean displayRefresh = false;
+boolean isBusy = false;
+
 // char array
 
 char enteredFreq[6];
 char tuningFreq[6];
 char key;
-char DisplayValueC1[5];
-char DisplayValueC2[5];
-char DisplayValueL[5];
-char DisplayValueSWR[5];
+char DisplayValueC1[6];
+char DisplayValueC2[6];
+char DisplayValueL[6];
+char DisplayValueSWR[6];
 char input; //buffer for input characters for calculations
 // char dataPrintout[10];
 
@@ -64,9 +73,9 @@ char input; //buffer for input characters for calculations
 // float valueLcorr = 0;       // calculated value L float
 // float Cmult;                // constant multiplier to calculate C value
 // float Lmult;                // constant multiplier to calculate L value
-float valueRotateC1;
-float valueRotateC2;
-float valueRotateL;
+float valueRotateC1 = -1;
+float valueRotateC2 = -1;
+float valueRotateL = -1;
 float valueSWR;
 
 boolean presentValue = false;
@@ -108,23 +117,29 @@ void busReceiver(const TCommand *payload, const PJON_Packet_Info &packet_info) {
 	switch (payload->id) {
 	case cmdStatus:
 
+	  /*
 		Serial.print("cnt=");
 		Serial.print(payload->status.cnt);
 		Serial.print(", Value fwd=");
 		Serial.print(payload->status.adc.fwd);
 		Serial.print(", Value rfl=");
 		Serial.println(payload->status.adc.rfl);
-
+    */
 
 		float rfl = payload->status.adc.rfl;
 		float fwd = payload->status.adc.fwd;
 //		float p = sqrt(rfl / fwd);              // SWR formula
     float p = (rfl / fwd);                    // VSWR formula
 		valueSWR = (1 + p) / (1 - p);
-		Serial.print(", Value SWR=");
-		Serial.println(valueSWR);
-        displaySWRvalue();
+		//Serial.print(", Value SWR=");
+		//Serial.println(valueSWR);
 
+		valueRotateL = payload->status.pos.lPos;
+		valueRotateC1 = payload->status.pos.c1Pos;
+		valueRotateC2 = payload->status.pos.c2Pos;
+		isBusy = payload->status.flags > 0;
+
+		displayRefresh = true;
 		break;
 	}
 }
@@ -132,7 +147,7 @@ void busReceiver(const TCommand *payload, const PJON_Packet_Info &packet_info) {
 void setup() {
   Serial.begin(115200);
   Serial2.begin(TS_PORT_BITRATE);
-
+  pinMode(40, OUTPUT);
   TFTscreen.begin();                                // initialise TFT screen
   TFTscreen.background(0, 20, 30);                  // clear the screen with a RGB background
 
@@ -142,12 +157,6 @@ void setup() {
 }
 
 void displayInitialScreen() {                      // displays "Wait Calibrating at start. To be linked to Motors "L" and "C" calibration process
-  // Displays "Set F:" at the bottom of the screen
-  TFTscreen.stroke(0, 255, 0);                      // set the font color
-  TFTscreen.setTextSize(1);                         // set the font size 2
-  TFTscreen.text("SET", 5, 117);                    // write the text to coordinates
-  TFTscreen.setTextSize(2);
-  TFTscreen.text("f:", 25, 110);
   // Displays SWR
   TFTscreen.stroke(0, 255, 0);                      // set the font color
   TFTscreen.setTextSize(2);                         // set the font size 2
@@ -192,24 +201,15 @@ void SetFrequency() {                               // when # pressed - sets fre
 
 
 void incL(float diff) {                             // rotate motor L with number of steps
-  EraseDisplayL();
-  valueRotateL = valueRotateL + diff;
-  displayL();
-  mechSetPosition(round (valueRotateL), round (valueRotateC1), round (valueRotateC2));
+  mechSetPosition(round (diff), 0, 0);
 }
 
 void incC1(float diff) {                            // rotate motor C1 Cold with number of steps
-  EraseDisplayC1();
-  valueRotateC1 = valueRotateC1 + diff;
-  displayC1();
-  mechSetPosition(round (valueRotateL), round (valueRotateC1), round (valueRotateC2));
+  mechSetPosition(0, round(diff), 0);
 }
 
 void incC2(float diff) {                            // rotate motor C2 Hot with number of steps
-  EraseDisplayC2();
-  valueRotateC2 = valueRotateC2 + diff;
-  displayC2();
-  mechSetPosition(round (valueRotateL), round (valueRotateC1), round (valueRotateC2));
+  mechSetPosition(0, 0, round(diff));
 }
 
 // void incLCorr(float diff) {
@@ -281,7 +281,11 @@ void EraseDisplaySWR() {                                   // erase display SWR 
 
 void displayL() {                                         // display L values
   dtostrf(valueRotateL, 5, 0, DisplayValueL);
-  TFTscreen.stroke(0, 255, 0);
+  if (isBusy) {
+    TFTscreen.stroke(255, 255, 0);
+  } else {
+    TFTscreen.stroke(0, 255, 0);
+  }
   TFTscreen.setTextSize(2);
   TFTscreen.text(DisplayValueL, 40, 40);
 }
@@ -294,7 +298,11 @@ void EraseDisplayL() {                                   // erase display L valu
 
 void displayC1() {                                       // display C values
   dtostrf(valueRotateC1, 5, 0, DisplayValueC1);
-  TFTscreen.stroke(0, 255, 0);
+  if (isBusy) {
+    TFTscreen.stroke(255, 255, 0);
+  } else {
+    TFTscreen.stroke(0, 255, 0);
+  }
   TFTscreen.setTextSize(2);
   TFTscreen.text(DisplayValueC1, 40, 60);
 }
@@ -307,7 +315,11 @@ void EraseDisplayC1() {                                   // erase display C val
 
 void displayC2() {                                       // display C values
   dtostrf(valueRotateC2, 5, 0, DisplayValueC2);
-  TFTscreen.stroke(0, 255, 0);
+  if (isBusy) {
+    TFTscreen.stroke(255, 255, 0);
+  } else {
+    TFTscreen.stroke(0, 255, 0);
+  }
   TFTscreen.setTextSize(2);
   TFTscreen.text(DisplayValueC2, 40, 80);
 }
@@ -402,26 +414,33 @@ void keypadEvent(KeypadEvent eKey) {
           SetFrequency();
           break;
         case 'c':                           // "C1 Cold" motor move 5 step CCW
-          incC1(-5);
+          incC1(-1);
           break;
         case 'C':                           // "C1 Cold" motor move 5 step CW
-          incC1(5);          
+          incC1(1);
           break;
         case 'h':                           // "C2 Hot" motor move 5 step CCW
-          incC2(-5);
+          incC2(-1);
           break;
         case 'H':                           // "C2 Hot" motor move 5 step CW
-          incC2(5);
+          incC2(1);
           break;
         case 'D':                           // "L" motor move 100 step CCW
-          incL(-100.0);
+          incL(-10.0);
           break;
         case 'U':                           // "L" motor move 100 step CW
-          incL(+100.0);
+          incL(+10.0);
           break;
         case '*':                           // erase entered frequency
           eraseFrequency();
           break;
+        case 'S':                           // erase entered frequency
+          mechAutoTune();
+          break;
+        case 'K':                           // erase entered frequency
+          mechFineTune();
+          break;
+
 //        case 'U':                           // calibrate both motors
 //          mechCalibrate(channelC1);
 //          break;
@@ -444,13 +463,41 @@ void loop() {
   {
     //                                               entering required frequency at screen bottom
     if (presentValue != true) {
+      /*
       EnteredFreqString = EnteredFreqString + key;
       int numLength = EnteredFreqString.length();
       EnteredFreqString.toCharArray(enteredFreq, 6);
       TFTscreen.stroke(0, 255, 0);
       TFTscreen.setTextSize(2);
       TFTscreen.text(enteredFreq, 50, 110);
+      */
     }
   }
+  if (displayRefresh) {
+
+    displaySWRvalue();
+
+    EraseDisplayL();
+    displayL();
+
+    EraseDisplayC1();
+    displayC1();
+
+    EraseDisplayC2();
+    displayC2();
+
+    if (!isBusy) {
+      TFTscreen.stroke(255, 255, 0);                  // set the font color
+      digitalWrite(40, LOW);
+    } else {
+      TFTscreen.stroke(0, 20, 20);
+      digitalWrite(40, HIGH);
+    }
+    TFTscreen.setTextSize(2);
+    TFTscreen.text("Ready", 30, 105);                // write the text to coordinates
+
+    displayRefresh = false;
+  }
+
   
 }

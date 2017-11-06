@@ -10,11 +10,11 @@
 
 const byte fwdPwrPin    = A5;     // Fwd signal from SWR sensor
 const byte rflPwrPin    = A6;     // Rev. signal from SWR sensor
-const byte diodeDropPin = A7;
 
 uint16_t fwdPwrVal = 0;
 uint16_t rflPwrVal = 0;
-uint16_t diodeDropVal = 0;
+const uint16_t diodeDropVal = 161*2;
+uint16_t adcCnt = 0;
 
 inline void adcStartconversion(uint8_t pin) {
   ADMUX  =  bit(REFS0) | ((pin - A0) & 0x07);
@@ -41,7 +41,7 @@ int16_t adcGetForwardVoltage(){
   static int16_t lpf;
   uint8_t low, high;
   low  = ADCL;  high = ADCH;
-  int16_t val = (((high << 8) | low) << 4);
+  int16_t val = (((high << 8) | low) << 3);
   lpf += (val -  lpf) >> 2;
   return lpf;
 }
@@ -50,16 +50,7 @@ int16_t adcGetReflectedVoltage(){
   static int16_t lpf;
   uint8_t low, high;
   low  = ADCL;  high = ADCH;
-  int16_t val = (((high << 8) | low) << 4);
-  lpf += (val -  lpf) >> 2;
-  return lpf;
-}
-
-int16_t adcDiodeDropVoltage(){
-  static int16_t lpf;
-  uint8_t low, high;
-  low  = ADCL;  high = ADCH;
-  int16_t val = (((high << 8) | low) << 4);
+  int16_t val = (((high << 8) | low) << 3);
   lpf += (val -  lpf) >> 2;
   return lpf;
 }
@@ -69,13 +60,11 @@ inline void adcLoop() {
     if (adcMuxPin() == fwdPwrPin) {
       fwdPwrVal = adcGetForwardVoltage();
       adcStartconversion(rflPwrPin);
-    } else if (adcMuxPin() == rflPwrPin) {
-      rflPwrVal = adcGetReflectedVoltage();
-      adcStartconversion(diodeDropPin);
     } else {
-      diodeDropVal = adcDiodeDropVoltage();
+      rflPwrVal = adcGetReflectedVoltage();
       adcStartconversion(fwdPwrPin);
     }
+    adcCnt++;
   }
 }
 
