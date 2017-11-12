@@ -17,8 +17,10 @@ AccelStepper stepperC1 = AccelStepper(1, 5, 6);  // Custom pinout "C1" - Step to
 AccelStepper stepperC2 = AccelStepper(1, 7, 8);  // Custom pinout "C2" - Step to D7, Dir to D8 (Default AccelStepper::FULL4WIRE (4 pins) on 2, 3, 4, 5)
 PROTO_MechStatus status;
 uint8_t isAutoTune = 0;
+uint8_t isDriversEnabled = 1;
 
 const byte ledPin = 13;     // Initialise LED for indication
+const byte driverEnablePin = 12;
 const byte optInpinL = A1;  // Signal pin Optical Interruptor Motor 1
 const byte optInpinC1 = A2;  // Signal pin Optical Interruptor Motor 2
 const byte optInpinC2 = A3;  // Signal pin Optical Interruptor Motor 3 C2
@@ -50,9 +52,23 @@ void inline calibrateC2(boolean run) {
   calibrate(&stepperC2, optInpinC2, run);
 }
 
+inline void driversEnable() {
+  if (!isDriversEnabled) {
+    digitalWrite(driverEnablePin, LOW);
+    delay(5);
+    isDriversEnabled = 1;
+  }
+}
+
+inline void driversDisable() {
+  digitalWrite(driverEnablePin, HIGH);
+  isDriversEnabled = 0;
+}
+
 void busReceiver(const TCommand *payload, const PJON_Packet_Info &packet_info) {
 	switch (payload->id) {
 	case cmdCalibrate:
+	  driversEnable();
 		switch (payload->cal.channel) {
 		case channelC1:
 			calibrateC1(true);
@@ -66,14 +82,17 @@ void busReceiver(const TCommand *payload, const PJON_Packet_Info &packet_info) {
 		}
 		break;
 	case cmdSetPos:
+	  driversEnable();
 		stepperL.moveTo(stepperL.targetPosition() + payload->pos.lPos);
 		stepperC1.moveTo(stepperC1.targetPosition() + payload->pos.c1Pos);
 		stepperC2.moveTo(stepperC2.targetPosition() + payload->pos.c2Pos);
 		break;
 	case cmdAutoTune:
+	  driversEnable();
 	  autoTune();
 	  break;
 	case cmdFineTune:
+	  driversEnable();
 	  fineTune();
 	  break;
 	}
@@ -84,6 +103,8 @@ void setup() {
   busInit(busReceiver, 2, &Serial);
   adcInit();
 
+  pinMode(driverEnablePin, OUTPUT);
+  digitalWrite(driverEnablePin, LOW);
   pinMode(ledPin, OUTPUT);               //  Defines LED
   pinMode(optInpinL, INPUT);             //  Defines Optical command PIN "L"
   pinMode(optInpinC1, INPUT);            //  Defines Optical command PIN "C"
@@ -122,7 +143,7 @@ void yeld() {
       stepperC2.run();
   }
   adcCnt = 0;
-  while (adcCnt < 64) {
+  while (adcCnt < 128) {
     busLoop();
     adcLoop();
     sendStatusUpdates();
@@ -202,6 +223,18 @@ void sendStatusUpdates() {
 		}
 }
 
+void managePower() {
+  static const unsigned long REFRESH_INTERVAL = 5000; // ms
+    static unsigned long lastRefreshTime = 0;
+    if(millis() - lastRefreshTime >= REFRESH_INTERVAL)
+    {
+      if (!stepperL.isRunning() && !stepperL.isRunning() && !stepperC2.isRunning()) {
+        driversDisable();
+      }
+    }
+}
+
+
 void loop() {
   busLoop();
   adcLoop();
@@ -210,4 +243,5 @@ void loop() {
   stepperC2.run();
   digitalWrite(ledPin, digitalRead(optInpinL));
   sendStatusUpdates();
+  managePower();
 }
