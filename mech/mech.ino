@@ -228,6 +228,7 @@ void managePower() {
     static unsigned long lastRefreshTime = 0;
     if(millis() - lastRefreshTime >= REFRESH_INTERVAL)
     {
+      lastRefreshTime = millis();
       if (!stepperL.isRunning() && !stepperL.isRunning() && !stepperC2.isRunning()) {
         driversDisable();
       }
