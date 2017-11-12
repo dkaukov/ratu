@@ -5,7 +5,7 @@
 // Measured 2964 steps 360 degrees revolution.
 
 #include "proto/device_id.h"  // communication protocol device ID 
-#include <AccelStepper.h>     / Accel Stepper library
+#include <AccelStepper.h>     // Accel Stepper library
 
 #define PJON_ID ID_MECH       // PJON definition (communication protocol)
 #include "proto/common.h"     // communication protocol library
@@ -22,6 +22,33 @@ const byte ledPin = 13;     // Initialise LED for indication
 const byte optInpinL = A1;  // Signal pin Optical Interruptor Motor 1
 const byte optInpinC1 = A2;  // Signal pin Optical Interruptor Motor 2
 const byte optInpinC2 = A3;  // Signal pin Optical Interruptor Motor 3 C2
+
+
+void calibrate(AccelStepper *chanel, uint8_t sensorPin, boolean run) {
+  long oldPosition = chanel->currentPosition();
+  chanel->setSpeed(-2000);
+  while (digitalRead(sensorPin) == LOW) {
+    chanel->runSpeed();
+    busLoop();
+  }
+  chanel->stop();
+  chanel->setCurrentPosition(0);
+  if (run) {
+    chanel->moveTo(oldPosition);
+  }
+}
+
+void inline calibrateL(boolean run) {
+  calibrate(&stepperL, optInpinL, run);
+}
+
+void inline calibrateC1(boolean run) {
+  calibrate(&stepperC1, optInpinC1, run);
+}
+
+void inline calibrateC2(boolean run) {
+  calibrate(&stepperC2, optInpinC2, run);
+}
 
 void busReceiver(const TCommand *payload, const PJON_Packet_Info &packet_info) {
 	switch (payload->id) {
@@ -103,18 +130,23 @@ void yeld() {
 }
 
 void optimize(AccelStepper *chanel, int16_t step, int16_t hysteresis) {
+  boolean isFirstStep = true;
   yeld();
   uint16_t prevSetepPwr = rflPwrVal;
   while (step != 0) {
     chanel->move(step);
     yeld();
     if (prevSetepPwr < (rflPwrVal + hysteresis)) {
-      step = -(step >> 1);
+      step = -step;
+      if (!isFirstStep) {
+        step = step >> 1;
+      }
     }
     prevSetepPwr = rflPwrVal;
     if ((fwdPwrVal == 0) || (rflPwrVal == 0)) {
       break;
     }
+    isFirstStep = false;
   }
 }
 
@@ -141,32 +173,6 @@ void fineTune() {
   optimize(&stepperC2, 10, 0);
   optimize(&stepperC1, 10, 0);
   isAutoTune = 0;
-}
-
-void calibrate(AccelStepper *chanel, uint8_t sensorPin, boolean run) {
-  long oldPosition = chanel->currentPosition();
-  chanel->setSpeed(-2000);
-  while (digitalRead(sensorPin) == LOW) {
-    chanel->runSpeed();
-    busLoop();
-  }
-  chanel->stop();
-  chanel->setCurrentPosition(0);
-  if (run) {
-    chanel->moveTo(oldPosition);
-  }
-}
-
-void inline calibrateL(boolean run) {
-  calibrate(&stepperL, optInpinL, run);
-}
-
-void inline calibrateC1(boolean run) {
-  calibrate(&stepperC1, optInpinC1, run);
-}
-
-void inline calibrateC2(boolean run) {
-  calibrate(&stepperC2, optInpinC2, run);
 }
 
 void updateStatus() {
