@@ -69,8 +69,7 @@ inline void adcLoop() {
       rflPwrVal = adcGetReflectedVoltage();
       adcStartconversion(fwdPwrPin);
     }
-    uint32_t tmp = (rflPwrVal << 10) / fwdPwrVal;
-    rflPwrPercent = tmp;
+    rflPwrPercent = ((uint32_t)rflPwrVal << 10) / fwdPwrVal;
     adcCnt++;
   }
 }
