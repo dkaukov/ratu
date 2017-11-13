@@ -44,7 +44,7 @@ int16_t adcGetForwardVoltage(){
   //int16_t val = (((high << 8) | low) << 3);
   //lpf += (val -  lpf) >> 2;
   int16_t val = ((high << 8) | low);
-  lpf = lpf - (lpf >> 4) + val;
+  lpf += (val - (lpf >> 4));
   return lpf;
 }
 
@@ -55,7 +55,7 @@ int16_t adcGetReflectedVoltage(){
   //int16_t val = (((high << 8) | low) << 3);
   //lpf += (val -  lpf) >> 2;
   int16_t val = ((high << 8) | low);
-  lpf = lpf - (lpf >> 4) + val;
+  lpf += (val - (lpf >> 4));
   return lpf;
 }
 
