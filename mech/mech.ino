@@ -178,7 +178,7 @@ void autoTune() {
   isAutoTune = 1;
   stepperC1.moveTo(10);
   stepperC2.moveTo(10);
-  stepperL.setAcceleration(800);
+  stepperL.setAcceleration(1600);
   optimize(&stepperL, 1000, 0);
   optimize(&stepperC1, 20, 0);
   optimize(&stepperC2, 20, 0);
