@@ -224,7 +224,7 @@ void sendStatusUpdates() {
 }
 
 void managePower() {
-  static const unsigned long REFRESH_INTERVAL = 5000; // ms
+  static const unsigned long REFRESH_INTERVAL = 200; // ms
     static unsigned long lastRefreshTime = 0;
     if(millis() - lastRefreshTime >= REFRESH_INTERVAL)
     {
