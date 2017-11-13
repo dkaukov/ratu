@@ -66,7 +66,7 @@ typedef struct TCommand {
 #define PJON_INCLUDE_TS
 
 #define PJON_MAX_PACKETS        4
-#define PJON_PACKET_MAX_LENGTH  sizeof(TCommand) + 4
+#define PJON_PACKET_MAX_LENGTH  sizeof(TCommand) + 13
 #define PJON_INCLUDE_ASYNC_ACK  false
 
 #define TS_BITRATE_SCALER     3
@@ -133,6 +133,9 @@ inline void busInit(PROTO_Receiver rcv, uint8_t enablePin, Stream *serial_port) 
   bus.strategy.set_enable_RS485_pin(enablePin);
   bus.set_receiver(__busReceiver);
   bus.set_synchronous_acknowledge(true);
+  bus.set_asynchronous_acknowledge(false);
+  bus.set_crc_32(false);
+  bus.set_shared_network(false);
   bus.set_error(__busErrorHandler);
   __rcv = rcv;
   bus.begin();
