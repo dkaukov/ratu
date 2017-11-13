@@ -85,9 +85,10 @@ typedef struct TCommand {
 #define SWBB_MAX_ATTEMPTS       20
 
 #include <PJON.h>
+#include "RS485Serial.h"
 
 //PJON<SoftwareBitBang> bus(PJON_ID);
-PJON<ThroughSerial> bus(PJON_ID);
+PJON<RS485Serial> bus(PJON_ID);
 
 typedef void (*PROTO_Receiver)(const TCommand *payload,
     const PJON_Packet_Info &packet_info);
