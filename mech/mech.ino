@@ -164,7 +164,7 @@ void optimize(AccelStepper *chanel, int16_t step, int16_t hysteresis) {
       }
     }
     prevSetepPwr = rflPwrVal;
-    if ((fwdPwrVal == 0) || (rflPwrVal == 0)) {
+    if (((fwdPwrVal >> 4) == 0) || ((rflPwrVal >> 4) == 0)) {
       break;
     }
     isFirstStep = false;
@@ -172,7 +172,7 @@ void optimize(AccelStepper *chanel, int16_t step, int16_t hysteresis) {
 }
 
 void autoTune() {
-  if ((fwdPwrVal == 0) || (isAutoTune)) {
+  if (((fwdPwrVal >> 4) == 0) || (isAutoTune)) {
     return;
   }
   isAutoTune = 1;
@@ -186,7 +186,7 @@ void autoTune() {
 }
 
 void fineTune() {
-  if ((fwdPwrVal == 0) || (isAutoTune)) {
+  if (((fwdPwrVal >> 4) == 0) || (isAutoTune)) {
     return;
   }
   isAutoTune = 1;
