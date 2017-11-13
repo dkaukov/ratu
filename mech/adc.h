@@ -13,6 +13,7 @@ const byte rflPwrPin    = A6;     // Rev. signal from SWR sensor
 
 uint16_t fwdPwrVal = 0;
 uint16_t rflPwrVal = 0;
+uint16_t rflPwrPercent = 0;
 const uint16_t diodeDropVal = 161 / 2;
 uint16_t adcCnt = 0;
 
@@ -68,6 +69,8 @@ inline void adcLoop() {
       rflPwrVal = adcGetReflectedVoltage();
       adcStartconversion(fwdPwrPin);
     }
+    uint32_t tmp = (rflPwrVal << 10) / fwdPwrVal;
+    rflPwrPercent = tmp;
     adcCnt++;
   }
 }

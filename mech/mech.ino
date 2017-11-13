@@ -153,17 +153,17 @@ void yeld() {
 void optimize(AccelStepper *chanel, int16_t step, int16_t hysteresis) {
   boolean isFirstStep = true;
   yeld();
-  uint16_t prevSetepPwr = rflPwrVal;
+  uint16_t prevSetepPwr = rflPwrPercent;
   while (step != 0) {
     chanel->move(step);
     yeld();
-    if (prevSetepPwr < (rflPwrVal + hysteresis)) {
+    if (prevSetepPwr < (rflPwrPercent + hysteresis)) {
       step = -step;
       if (!isFirstStep) {
         step = step >> 1;
       }
     }
-    prevSetepPwr = rflPwrVal;
+    prevSetepPwr = rflPwrPercent;
     if (((fwdPwrVal >> 4) == 0) || ((rflPwrVal >> 4) == 0)) {
       break;
     }
@@ -233,7 +233,6 @@ void managePower() {
       }
     }
 }
-
 
 void loop() {
   busLoop();
