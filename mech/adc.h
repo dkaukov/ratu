@@ -8,8 +8,9 @@
 #ifndef ADC_H_
 #define ADC_H_
 
-const byte fwdPwrPin    = A5;     // Fwd signal from SWR sensor
-const byte rflPwrPin    = A6;     // Rev. signal from SWR sensor
+const uint8_t fwdPwrPin    = A5;     // Fwd signal from SWR sensor
+const uint8_t rflPwrPin    = A6;     // Rev. signal from SWR sensor
+const uint8_t lpfAdcFactor = 4;
 
 uint16_t fwdPwrVal = 0;
 uint16_t rflPwrVal = 0;
@@ -41,23 +42,23 @@ inline uint8_t isAdcConversionFinished(){
 int16_t adcGetForwardVoltage(){
   static int16_t lpf;
   uint8_t low, high;
-  low  = ADCL;  high = ADCH;
-  //int16_t val = (((high << 8) | low) << 3);
-  //lpf += (val -  lpf) >> 2;
+  low  = ADCL; high = ADCH;
   int16_t val = ((high << 8) | low);
-  lpf += (val - (lpf >> 4));
+  lpf += (val - (lpf >> lpfAdcFactor));
   return lpf;
 }
 
 int16_t adcGetReflectedVoltage(){
   static int16_t lpf;
   uint8_t low, high;
-  low  = ADCL;  high = ADCH;
-  //int16_t val = (((high << 8) | low) << 3);
-  //lpf += (val -  lpf) >> 2;
+  low  = ADCL; high = ADCH;
   int16_t val = ((high << 8) | low);
-  lpf += (val - (lpf >> 4));
+  lpf += (val - (lpf >> lpfAdcFactor));
   return lpf;
+}
+
+inline uint8_t adcLpfRaiseCnt() {
+  return (1 << (lpfAdcFactor + 1));
 }
 
 inline void adcLoop() {
@@ -69,7 +70,7 @@ inline void adcLoop() {
       rflPwrVal = adcGetReflectedVoltage();
       adcStartconversion(fwdPwrPin);
     }
-    rflPwrPercent = ((uint32_t)rflPwrVal << 10) / fwdPwrVal;
+    rflPwrPercent = ((uint32_t)rflPwrVal << (10 + lpfAdcFactor)) / fwdPwrVal;
     adcCnt++;
   }
 }
