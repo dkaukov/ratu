@@ -157,7 +157,7 @@ void optimize(AccelStepper *chanel, int16_t step, int16_t hysteresis) {
   while (step != 0) {
     chanel->move(step);
     yeld();
-    if (prevSetepPwr < (rflPwrVal + hysteresis)) {
+    if (prevSetepPwr < (rflPwrVal - hysteresis)) {
       step = -step;
       if (!isFirstStep) {
         step = step >> 1;
