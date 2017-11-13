@@ -95,6 +95,9 @@ void busReceiver(const TCommand *payload, const PJON_Packet_Info &packet_info) {
 	  driversEnable();
 	  fineTune();
 	  break;
+	case cmdStatusReq:
+	  halSendStatusUpdateReply(status);
+	  break;
 	}
 }
 
@@ -212,13 +215,12 @@ void updateStatus() {
 }
 
 void sendStatusUpdates() {
-	static const unsigned long REFRESH_INTERVAL = 500; // ms
+	static const unsigned long REFRESH_INTERVAL = 20; // ms
 		static unsigned long lastRefreshTime = 0;
 		if(millis() - lastRefreshTime >= REFRESH_INTERVAL)
 		{
 			lastRefreshTime = millis();
 			updateStatus();
-			halSendStatusUpdate(status);
 		}
 }
 

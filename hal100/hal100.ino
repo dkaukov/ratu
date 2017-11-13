@@ -114,34 +114,33 @@ Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
 // --- end of Keypad code ---
 
 void busReceiver(const TCommand *payload, const PJON_Packet_Info &packet_info) {
-	switch (payload->id) {
-	case cmdStatus:
+  switch (payload->id) {
+    case cmdStatus: {
+      Serial.print("cnt=");
+      Serial.print(payload->status.cnt);
+      Serial.print(", Value fwd=");
+      Serial.print(payload->status.adc.fwd);
+      Serial.print(", Value rfl=");
+      Serial.println(payload->status.adc.rfl);
 
-	 
-		Serial.print("cnt=");
-		Serial.print(payload->status.cnt);
-		Serial.print(", Value fwd=");
-		Serial.print(payload->status.adc.fwd);
-		Serial.print(", Value rfl=");
-		Serial.println(payload->status.adc.rfl);
-   
+      float rfl = payload->status.adc.rfl;
+      float fwd = payload->status.adc.fwd;
+      float p = (rfl / fwd);
+      valueSWR = (1 + p) / (1 - p);
 
-		float rfl = payload->status.adc.rfl;
-		float fwd = payload->status.adc.fwd;
-//		float p = sqrt(rfl / fwd);              // SWR formula
-    		float p = (rfl / fwd);                    // VSWR formula
-		valueSWR = (1 + p) / (1 - p);
-		//Serial.print(", Value SWR=");
-		//Serial.println(valueSWR);
+      valueRotateL = payload->status.pos.lPos;
+      valueRotateC1 = payload->status.pos.c1Pos;
+      valueRotateC2 = payload->status.pos.c2Pos;
+      isBusy = payload->status.flags > 0;
 
-		valueRotateL = payload->status.pos.lPos;
-		valueRotateC1 = payload->status.pos.c1Pos;
-		valueRotateC2 = payload->status.pos.c2Pos;
-		isBusy = payload->status.flags > 0;
-
-		displayRefresh = true;
-		break;
-	}
+      displayRefresh = true;
+      break;
+    }
+    case cmdDebug: {
+      Serial.write(payload->str.str, payload->str.len);
+      break;
+    }
+  }
 }
 
 void setup() {
@@ -404,6 +403,18 @@ void eraseFrequency() {                         // when * pressed - erases enter
 //  send syntax '1,valueRotateL;' to Nano
 //}
 
+
+void sendStatusRequest() {
+  static const unsigned long REFRESH_INTERVAL = 100; // ms
+    static unsigned long lastRefreshTime = 0;
+    if(millis() - lastRefreshTime >= REFRESH_INTERVAL)
+    {
+      lastRefreshTime = millis();
+      mechSendStatusRequest();
+    }
+}
+
+
 //Keypad events
 void keypadEvent(KeypadEvent eKey) {
   switch (keypad.getState()) {
@@ -456,6 +467,7 @@ void keypadEvent(KeypadEvent eKey) {
 
 void loop() {
   busLoop();
+  sendStatusRequest();
 
   key = keypad.getKey();
 
