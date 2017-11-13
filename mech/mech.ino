@@ -143,7 +143,7 @@ void yeld() {
       stepperC2.run();
   }
   adcCnt = 0;
-  while (adcCnt < 128) {
+  while (adcCnt < 16) {
     busLoop();
     adcLoop();
     sendStatusUpdates();
@@ -178,7 +178,7 @@ void autoTune() {
   isAutoTune = 1;
   stepperC1.moveTo(10);
   stepperC2.moveTo(10);
-  stepperL.setAcceleration(20000);
+  stepperL.setAcceleration(800);
   optimize(&stepperL, 1000, 0);
   optimize(&stepperC1, 20, 0);
   optimize(&stepperC2, 20, 0);
