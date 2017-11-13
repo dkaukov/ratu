@@ -112,7 +112,7 @@ void setup() {
 
   stepperL.setMaxSpeed(2000);            //  Set maximum roration speed for "L" Motor 1
   stepperL.setSpeed(1500);               //  Set maximum calibration speed for "L" Motor 1
-  stepperL.setAcceleration(2000);        //  Set maximum acceleration for "L" Motor 1
+  stepperL.setAcceleration(4000);        //  Set maximum acceleration for "L" Motor 1
 
   stepperC1.setMaxSpeed(2000);           //  Set maximum roration speed for "C" Motor 2
   stepperC1.setSpeed(1000);              //  Set maximum calibration speed for "C" Motor 2
@@ -178,8 +178,7 @@ void autoTune() {
   isAutoTune = 1;
   stepperC1.moveTo(10);
   stepperC2.moveTo(10);
-  stepperL.setAcceleration(1600);
-  optimize(&stepperL, 1000, 0);
+  optimize(&stepperL, 2000, 0);
   optimize(&stepperC1, 20, 0);
   optimize(&stepperC2, 20, 0);
   isAutoTune = 0;
