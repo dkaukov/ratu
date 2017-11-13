@@ -143,7 +143,7 @@ void yeld() {
       stepperC2.run();
   }
   adcCnt = 0;
-  while (adcCnt < 16) {
+  while (adcCnt < 32) {
     busLoop();
     adcLoop();
     sendStatusUpdates();
