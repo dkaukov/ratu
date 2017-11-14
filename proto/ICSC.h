@@ -43,11 +43,11 @@
 
 // Uncomment the definition of ICSC_NO_STATS if you don't need stats
 // and need to save space
-#define ICSC_NO_STATS
+//#define ICSC_NO_STATS
 
 // Uncomment the ICSC_COLLISION_DETECTION if collision detection is needed
 // On Arduino the transmit and receive are isolated and therefor not needed
-//#define ICSC_COLLISION_DETECTION
+#define ICSC_COLLISION_DETECTION
 
 #ifndef ICSC_DYNAMIC
 // This defines the maximum size of any message that can be sent
@@ -191,6 +191,7 @@ class ICSC {
         void setStream(Stream *d) {
           _dev = d;
         }
+
         void setDePin(int depin) {
           _dePin = depin;
         }
