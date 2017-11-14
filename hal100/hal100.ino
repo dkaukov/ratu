@@ -113,7 +113,7 @@ byte colPins[COLS] = { 22, 24, 26, 28 };
 Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
 // --- end of Keypad code ---
 
-void busReceiver(const TCommand *payload, const PJON_Packet_Info &packet_info) {
+void busReceiver(const TCommand *payload) {
   switch (payload->id) {
     case cmdStatus: {
       Serial.print("cnt=");

@@ -65,7 +65,7 @@ inline void driversDisable() {
   isDriversEnabled = 0;
 }
 
-void busReceiver(const TCommand *payload, const PJON_Packet_Info &packet_info) {
+void busReceiver(const TCommand *payload) {
 	switch (payload->id) {
 	case cmdCalibrate:
 	  driversEnable();
