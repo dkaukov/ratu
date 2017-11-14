@@ -11,11 +11,6 @@
 class RS485Serial : public ThroughSerial {
 public:
 
-  bool can_start() {
-    // Only check we need that buffers are empty
-    return !PJON_SERIAL_AVAILABLE(serial);
-  };
-
   uint16_t receive_string(uint8_t *string, uint16_t max_length) {
     // quickly return if buffers are empty.
     if(max_length == PJON_PACKET_MAX_LENGTH) {
