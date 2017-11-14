@@ -73,7 +73,7 @@ typedef struct TCommand {
 #define TS_BYTE_TIME_OUT      1200 / TS_BITRATE_SCALER
 #define TS_COLLISION_DELAY    2400 / TS_BITRATE_SCALER
 #define TS_RESPONSE_TIME_OUT  20000
-#define TS_TIME_IN            1200 / TS_BITRATE_SCALER
+//#define TS_TIME_IN            1200 / TS_BITRATE_SCALER
 #define TS_BACK_OFF_DEGREE    4
 #define TS_MAX_ATTEMPTS       3
 #define TS_PORT_BITRATE       9600 * TS_BITRATE_SCALER
