@@ -62,13 +62,13 @@ typedef struct TCommand {
 
 ICSC icsc(PJON_ID);
 
-typedef void (*PROTO_Receiver)(char cmd, const TCommand *payload);
+typedef void (*PROTO_Receiver)(char cmd, uint8_t length, const TCommand *payload);
 
 PROTO_Receiver __rcv = NULL;
 
 void __icscReceiver(uint8_t sender, char cmd, uint8_t length, uint8_t *payload) {
   if (length <= sizeof(TCommand) && __rcv != NULL) {
-    __rcv(cmd, (TCommand *) payload);
+    __rcv(cmd, length, (TCommand *) payload);
   }
 }
 

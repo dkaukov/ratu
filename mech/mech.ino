@@ -68,7 +68,7 @@ inline void driversDisable() {
   isDriversEnabled = 0;
 }
 
-void busReceiver(char cmd, const TCommand *payload) {
+void busReceiver(char cmd, uint8_t length, const TCommand *payload) {
 	switch (cmd) {
 	case cmdCalibrate:
 	  driversEnable();
@@ -254,4 +254,5 @@ void loop() {
   digitalWrite(ledPin, digitalRead(optInpinL));
   sendStatusUpdates();
   managePower();
+  debugLoop();
 }
