@@ -64,7 +64,7 @@ typedef struct TCommand {
 } TCommand;
 
 
-#define TS_PORT_BITRATE 28800
+#define TS_PORT_BITRATE 9600
 
 #include "ICSC.h"
 
