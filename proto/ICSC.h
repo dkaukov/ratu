@@ -425,7 +425,7 @@ boolean ICSC::process()
         _lastByteSeen = millis();
 
         Serial.print("inch=");
-        Serial.print(inch);
+        Serial.print(inch, HEX);
         Serial.print(", _recPhase=");
         Serial.println(_recPhase);
 
@@ -520,6 +520,7 @@ boolean ICSC::process()
                 if (inch == EOT) {
                     if (_recCS == _recCalcCS) {
 
+                      Serial.println("Packet..");
 
                         // First, check for system level commands.  It is possible
                         // to register your own callback as well for system level
@@ -548,6 +549,7 @@ boolean ICSC::process()
                                && _commands[i].callback)
                             {
                                 _commands[i].callback(_recSender, _recCommand, _recLen, _data);
+                                Serial.println("Callback");
                                 #ifndef ICSC_NO_STATS
                                 _stats.cb_run++;
                                 #endif
