@@ -137,7 +137,7 @@ void busReceiver(char cmd, const TCommand *payload) {
       break;
     }
     case cmdDebug: {
-      Serial.write(payload->str.str, payload->str.len);
+      Serial.write((char *)payload, 1);
       break;
     }
   }
