@@ -19,9 +19,9 @@
   http://www.arduino.cc/en/Tutorial/TFTDisplayText
 
 
-Motor 1 = "L" Motor
-Motor 2 = "C1" Motor "Cold"
-Motor 3 = "C2 Motor "Hot"
+  Motor 1 = "L" Motor
+  Motor 2 = "C1" Motor "Cold"
+  Motor 3 = "C2 Motor "Hot"
 
 */
 #include "proto/device_id.h"
@@ -34,8 +34,8 @@ Motor 3 = "C2 Motor "Hot"
 
 //Bell icon size: 16W*16H
 const unsigned char bell [] PROGMEM = {
-0x01, 0x80, 0x03, 0xc0, 0x0f, 0xf0, 0x1f, 0xf8, 0x1f, 0xf8, 0x1f, 0xf8, 0x3f, 0xfc, 0x3f, 0xfc,
-0x3f, 0xfc, 0x3f, 0xfc, 0x3f, 0xfc, 0x7f, 0xfe, 0x7f, 0xfe, 0xc3, 0xc3, 0xc3, 0xc3, 0x3f, 0xfc,
+  0x01, 0x80, 0x03, 0xc0, 0x0f, 0xf0, 0x1f, 0xf8, 0x1f, 0xf8, 0x1f, 0xf8, 0x3f, 0xfc, 0x3f, 0xfc,
+  0x3f, 0xfc, 0x3f, 0xfc, 0x3f, 0xfc, 0x7f, 0xfe, 0x7f, 0xfe, 0xc3, 0xc3, 0xc3, 0xc3, 0x3f, 0xfc,
 };
 
 // TFT display CS, RS and RST pins definition for Mega2560
@@ -80,8 +80,8 @@ float valueSWR;
 
 boolean presentValue = false;
 
- String EnteredFreqString, TuningFreqString;
- String DisplayValueLstring;
+String EnteredFreqString, TuningFreqString;
+String DisplayValueLstring;
 
 int i;
 
@@ -91,17 +91,17 @@ const byte ROWS = 5; // Five rows
 const byte COLS = 4; // Four columns
 // Define the Keymap
 char keys[ROWS][COLS] = {
-// Buttons association 1=1 2=2 3=3 4=4 5=5 6=6 7=7 8=8 9=9 0=0 *=Led OFF #=Led ON
-// TOP Buttons  C c L l
-//Buttons in middle H U D S
+  // Buttons association 1=1 2=2 3=3 4=4 5=5 6=6 7=7 8=8 9=9 0=0 *=Led OFF #=Led ON
+  // TOP Buttons  C c L l
+  //Buttons in middle H U D S
 
-// COL0-pin1, COL1-pin2, COL2-pin3, COL3-pin4 
-  {'S', '1', '2', '3'}, // ROW0-pin5      
+  // COL0-pin1, COL1-pin2, COL2-pin3, COL3-pin4
+  {'S', '1', '2', '3'}, // ROW0-pin5
   {'K', '4', '5', '6'}, // ROW1-pin6
-  {'U', '7', '8', '9'}, // ROW2-pin7      
+  {'U', '7', '8', '9'}, // ROW2-pin7
   {'D', '*', '0', '#'}, // ROW3-pin8
   {'c', 'C', 'h', 'H'}  // ROW4-pin9
-       
+
 };
 
 // Connect keypad ROW0 Pad pin ->> 5=30 <<- pin Mega, ROW1 6=32, ROW2 7=23, ROW3 8=25, ROW4 9=27
@@ -116,30 +116,30 @@ Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
 void busReceiver(char cmd, uint8_t length, const TCommand *payload) {
   switch (cmd) {
     case cmdStatus: {
-      Serial.print("cnt=");
-      Serial.print(payload->status.cnt);
-      Serial.print(", Value fwd=");
-      Serial.print(payload->status.adc.fwd);
-      Serial.print(", Value rfl=");
-      Serial.println(payload->status.adc.rfl);
+        Serial.print("cnt=");
+        Serial.print(payload->status.cnt);
+        Serial.print(", Value fwd=");
+        Serial.print(payload->status.adc.fwd);
+        Serial.print(", Value rfl=");
+        Serial.println(payload->status.adc.rfl);
 
-      float rfl = payload->status.adc.rfl;
-      float fwd = payload->status.adc.fwd;
-      float p = (rfl / fwd);
-      valueSWR = (1 + p) / (1 - p);
+        float rfl = payload->status.adc.rfl;
+        float fwd = payload->status.adc.fwd;
+        float p = (rfl / fwd);
+        valueSWR = (1 + p) / (1 - p);
 
-      valueRotateL = payload->status.pos.lPos;
-      valueRotateC1 = payload->status.pos.c1Pos;
-      valueRotateC2 = payload->status.pos.c2Pos;
-      isBusy = payload->status.flags > 0;
+        valueRotateL = payload->status.pos.lPos;
+        valueRotateC1 = payload->status.pos.c1Pos;
+        valueRotateC2 = payload->status.pos.c2Pos;
+        isBusy = payload->status.flags > 0;
 
-      displayRefresh = true;
-      break;
-    }
+        displayRefresh = true;
+        break;
+      }
     case cmdDebug: {
-      Serial.write((char *)payload, length);
-      break;
-    }
+        Serial.write((char *)payload, length);
+        break;
+      }
   }
 }
 
@@ -159,25 +159,25 @@ void displayInitialScreen() {                      // displays "Wait Calibrating
   // Displays SWR
   TFTscreen.stroke(0, 255, 0);                      // set the font color
   TFTscreen.setTextSize(2);                         // set the font size 2
-  TFTscreen.text("SWR", 5, 10);                     // write the text to coordinates 
+  TFTscreen.text("SWR", 5, 10);                     // write the text to coordinates
   // Displays L
   TFTscreen.stroke(0, 255, 0);                      // set the font color
   TFTscreen.setTextSize(2);                         // set the font size 2
-  TFTscreen.text("L", 5, 40);                     // write the text to coordinates  
+  TFTscreen.text("L", 5, 40);                     // write the text to coordinates
   // Displays C1
-  TFTscreen.stroke(0, 255, 0);                      // set the font color             
+  TFTscreen.stroke(0, 255, 0);                      // set the font color
   TFTscreen.setTextSize(2);                         // set the font size 2
   TFTscreen.text("C1", 5, 60);                     // write the text to coordinates
   // Displays C2
-  TFTscreen.stroke(0, 255, 0);                      // set the font color             
+  TFTscreen.stroke(0, 255, 0);                      // set the font color
   TFTscreen.setTextSize(2);                         // set the font size 2
-  TFTscreen.text("C2", 5, 80);                     // write the text to coordinates  
+  TFTscreen.text("C2", 5, 80);                     // write the text to coordinates
 
   keypad.addEventListener(keypadEvent);             //add an event listener for this keypad
 }
 
 //void SetFrequencyStage1() {
-	// STAGE 1 tuning process
+// STAGE 1 tuning process
 //	calculateC();                                     // calculate C value at selected frequency
 //	calculateStepsC();                                // calculate steps needed to move C to value C
 //	CmoveStage1();                                    // send command to nano to move motor "C" to C step value
@@ -187,15 +187,15 @@ void displayInitialScreen() {                      // displays "Wait Calibrating
 //	EraseDisplayC1(), EraseDisplayL();                 // clear previous values L and C at display
 //	displayC1(), displayL();                           // display current values L and C at display
 //	mechSetPosition(round (valueRotateL), round (valueRotateC1), round (valueRotateC2));
-	// End STAGE 1 tuning process
+// End STAGE 1 tuning process
 //}
 
 // Pre-STAGE 1 (coarse tuning process) cleanups and displays - will be used later
 void SetFrequency() {                               // when # pressed - sets frequency value at the bottom of the screen
   eraseFreqTopScreen();                             // clear previously entered drequesncy at display top
-  eraseEnteredFrequency();                          // clear entered frequency at display bottom  
+  eraseEnteredFrequency();                          // clear entered frequency at display bottom
   displayFreqTopScreen();                           // display desired frequesncy at display top
-//  SetFrequencyStage1();
+  //  SetFrequencyStage1();
 }
 
 
@@ -261,8 +261,8 @@ void eraseEnteredFrequency () {               // erase frequency value at the bo
 }
 
 void displaySWRvalue() {                                    // process to display SWR values
-    EraseDisplaySWR();
-    displaySWR();
+  EraseDisplaySWR();
+  displaySWR();
 }
 
 void displaySWR() {                                         // display SWR values
@@ -329,6 +329,24 @@ void EraseDisplayC2() {                                   // erase display C val
   TFTscreen.text(DisplayValueC2, 40, 80);
 }
 
+void displayLuH() {
+  double stepsToMh(float x) {
+    return  3.2408606623203362e-001 * pow(x, 0)
+            +  4.8175734249036963e-005 * pow(x, 1)
+            + -8.2394558534492893e-009 * pow(x, 2)
+            +  4.1381892772191581e-012 * pow(x, 3)
+            + -5.0628320718901775e-016 * pow(x, 4)
+            +  3.2564586259750260e-020 * pow(x, 5)
+            + -1.1101886921087241e-024 * pow(x, 6)
+            +  1.3237902692887521e-029 * pow(x, 7)
+            +  3.9488291689952899e-034 * pow(x, 8)
+            + -1.8793946779017113e-038 * pow(x, 9)
+            +  3.2823426065013548e-043 * pow(x, 10)
+            + -2.7820892583909193e-048 * pow(x, 11)
+            +  9.4929814793314678e-054 * pow(x, 12);
+  }
+}
+
 void eraseFrequency() {                         // when * pressed - erases entered frequency bottom of the screen
   EnteredFreqString = "";
   TuningFreqString = "";
@@ -370,7 +388,7 @@ void eraseFrequency() {                         // when * pressed - erases enter
 //}
 
 //void calculateStepsC() {                        // calculate needed steps for C
-  // Process for linear capacitor with 44-408 pF - need to ajust or change for different capacitor
+// Process for linear capacitor with 44-408 pF - need to ajust or change for different capacitor
 //  float totalStepsC = 2964;
 //  float pFmin = 20;
 //  float pFmax = 200;
@@ -388,8 +406,8 @@ void eraseFrequency() {                         // when * pressed - erases enter
 //}
 
 //void calculateStepsL() {                        // calculate needed steps for L
- // Process for non-linear variable inductor - need to ajust or change for different inductor  
- // y = -0.0299x2 + 1.3867x + 0.5894
+// Process for non-linear variable inductor - need to ajust or change for different inductor
+// y = -0.0299x2 + 1.3867x + 0.5894
 // float totalStepsL = 2964;                                                              // total motor steps for 1 rotation
 // float LturnsRequred = ( -0.0299 * valueL * valueL ) + ( 1.3867 * valueL ) + 0.5894;    // poly math
 // valueRotateL = LturnsRequred * totalStepsL;
@@ -406,12 +424,12 @@ void eraseFrequency() {                         // when * pressed - erases enter
 
 void sendStatusRequest() {
   static const unsigned long REFRESH_INTERVAL = 100; // ms
-    static unsigned long lastRefreshTime = 0;
-    if(millis() - lastRefreshTime >= REFRESH_INTERVAL)
-    {
-      lastRefreshTime = millis();
-      mechSendStatusRequest();
-    }
+  static unsigned long lastRefreshTime = 0;
+  if (millis() - lastRefreshTime >= REFRESH_INTERVAL)
+  {
+    lastRefreshTime = millis();
+    mechSendStatusRequest();
+  }
 }
 
 
@@ -452,13 +470,13 @@ void keypadEvent(KeypadEvent eKey) {
           mechFineTune();
           break;
 
-//        case 'U':                           // calibrate both motors
-//          mechCalibrate(channelC1);
-//          break;
-//        case 'D':                           // calibrate both motors
-//          mechCalibrate(channelL);
-//          break;
-          
+          //        case 'U':                           // calibrate both motors
+          //          mechCalibrate(channelC1);
+          //          break;
+          //        case 'D':                           // calibrate both motors
+          //          mechCalibrate(channelL);
+          //          break;
+
       }
   }
 }
@@ -476,12 +494,12 @@ void loop() {
     //                                               entering required frequency at screen bottom
     if (presentValue != true) {
       /*
-      EnteredFreqString = EnteredFreqString + key;
-      int numLength = EnteredFreqString.length();
-      EnteredFreqString.toCharArray(enteredFreq, 6);
-      TFTscreen.stroke(0, 255, 0);
-      TFTscreen.setTextSize(2);
-      TFTscreen.text(enteredFreq, 50, 110);
+        EnteredFreqString = EnteredFreqString + key;
+        int numLength = EnteredFreqString.length();
+        EnteredFreqString.toCharArray(enteredFreq, 6);
+        TFTscreen.stroke(0, 255, 0);
+        TFTscreen.setTextSize(2);
+        TFTscreen.text(enteredFreq, 50, 110);
       */
     }
   }
@@ -511,5 +529,5 @@ void loop() {
     displayRefresh = false;
   }
 
-  
+
 }
