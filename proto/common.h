@@ -20,9 +20,9 @@ enum {
 };
 
 typedef struct PROTO_AbsPosParams {
-  uint32_t lPos;
-  uint32_t c1Pos;
-  uint32_t c2Pos;
+  int32_t lPos;
+  int32_t c1Pos;
+  int32_t c2Pos;
 } PROTO_AbsPosParams;
 
 typedef struct PROTO_DeltaPosParams {
@@ -64,7 +64,7 @@ typedef struct TCommand {
 } TCommand;
 
 
-#define TS_PORT_BITRATE 28800
+#define TS_PORT_BITRATE 38400
 
 #include "ICSC.h"
 
