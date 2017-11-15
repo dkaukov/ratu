@@ -63,7 +63,7 @@
 // If you want lots of commands you may need to increase this
 // value.  Note that this ony affects the commands registerable
 // at the receiving end
-#define MAX_COMMANDS 10
+#define MAX_COMMANDS 1
 #endif
 
 //If this StationId is used during send(broadcast)
