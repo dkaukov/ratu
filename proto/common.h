@@ -64,7 +64,7 @@ typedef struct TCommand {
 } TCommand;
 
 
-#define TS_PORT_BITRATE 9600
+#define TS_PORT_BITRATE 28800
 
 #include "ICSC.h"
 
@@ -75,16 +75,7 @@ typedef void (*PROTO_Receiver)(const TCommand *payload);
 PROTO_Receiver __rcv = NULL;
 
 void __icscReceiver(uint8_t sender, char cmd, uint8_t length, uint8_t *payload) {
-  Serial.print("__icscReceiver sender=");
-  Serial.print(sender, DEC);
-  Serial.print(", cmd=");
-  Serial.print(cmd, DEC);
-  Serial.print(", sizeof(TCommand)=");
-  Serial.print(sizeof(TCommand), DEC);
-  Serial.print(", length=");
-  Serial.println(length, DEC);
   if (length <= sizeof(TCommand) && __rcv != NULL) {
-    Serial.println("Intrnal Callback");
     __rcv((TCommand *) payload);
   }
 }

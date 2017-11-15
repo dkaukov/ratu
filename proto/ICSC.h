@@ -520,8 +520,6 @@ boolean ICSC::process()
                 if (inch == EOT) {
                     if (_recCS == _recCalcCS) {
 
-                      Serial.println("Packet..");
-
                         // First, check for system level commands.  It is possible
                         // to register your own callback as well for system level
                         // commands which will be called after the system default
@@ -546,9 +544,7 @@ boolean ICSC::process()
                       #endif
                           if ((_commands[i].commandCode == _recCommand) || (_commands[i].commandCode == ICSC_CATCH_ALL)) {
                             if (_commands[i].callback != NULL) {
-                              Serial.println("Callback");
                               _commands[i].callback(_recSender, _recCommand, _recLen, _data);
-                              Serial.println("after Callback");
 
                             }
                           }
