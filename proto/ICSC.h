@@ -56,7 +56,7 @@
 // size of packets that can be received - you can always send
 // up to 255 bytes.  If the remote end can't receive them all
 // the packet will be silently discarded.
-#define MAX_MESSAGE 250
+#define MAX_MESSAGE sizeof(TCommand) + 1
 
 // The maximum number of registered commands.  If you're not
 // going to have many commands reducing this can save memory.
