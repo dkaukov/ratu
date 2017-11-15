@@ -215,7 +215,7 @@ void updateStatus() {
 }
 
 void sendStatusUpdates() {
-	static const unsigned long REFRESH_INTERVAL = 20; // ms
+	static const unsigned long REFRESH_INTERVAL = 1000; // ms
 		static unsigned long lastRefreshTime = 0;
 		if(millis() - lastRefreshTime >= REFRESH_INTERVAL)
 		{
