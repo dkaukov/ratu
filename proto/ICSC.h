@@ -101,7 +101,7 @@ typedef void (* callbackFunction)(
 
 // Structure to store command code / function pairs
 typedef struct {
-    char commandCode;
+    uint8_t commandCode;
     callbackFunction callback;
 } command_t, *command_ptr;
 
