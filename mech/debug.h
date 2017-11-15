@@ -25,9 +25,7 @@ uint8_t __dbg_buff_ptr = 0;
 static FILE debugout = {0};
 
 static int debug_putchar (char c, FILE *stream) {
-  //CLI_serial_write(c);
-  //icsc.send(ID_HAL100, (char) cmdDebug, c);
-  if (__dbg_buff_ptr <= BUFF_SIZE) {
+  if (__dbg_buff_ptr < BUFF_SIZE) {
     __dbg_buff[__dbg_buff_ptr] = c;
     __dbg_buff_ptr++;
   } else {
