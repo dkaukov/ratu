@@ -20,9 +20,9 @@ enum {
 };
 
 typedef struct PROTO_AbsPosParams {
-  int32_t lPos;
-  int32_t c1Pos;
-  int32_t c2Pos;
+  uint16_t lPos;
+  int16_t c1Pos;
+  int16_t c2Pos;
 } PROTO_AbsPosParams;
 
 typedef struct PROTO_DeltaPosParams {
