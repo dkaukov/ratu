@@ -555,8 +555,9 @@ boolean ICSC::process()
                                  _commands[i].commandCode == ICSC_CATCH_ALL )
                                && _commands[i].callback)
                             {
-                                _commands[i].callback(_recSender, _recCommand, _recLen, _data);
                                 Serial.println("Callback");
+                                _commands[i].callback(_recSender, _recCommand, _recLen, _data);
+                                Serial.println("after Callback");
                                 #ifndef ICSC_NO_STATS
                                 _stats.cb_run++;
                                 #endif

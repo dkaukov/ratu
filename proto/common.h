@@ -74,7 +74,7 @@ typedef void (*PROTO_Receiver)(const TCommand *payload);
 
 PROTO_Receiver __rcv = NULL;
 
-void __icscReceiver(uint8_t sender, char cmd, uint8_t length, char *payload) {
+void __icscReceiver(uint8_t sender, char cmd, uint8_t length, uint8_t *payload) {
   if (length <= sizeof(TCommand) && __rcv != NULL) {
     Serial.println("Intrnal Callback");
     __rcv((TCommand *) payload);
@@ -83,7 +83,7 @@ void __icscReceiver(uint8_t sender, char cmd, uint8_t length, char *payload) {
 
 inline void busInit(PROTO_Receiver rcv, uint8_t enablePin, Stream *serial_port) {
   icsc.setStream(serial_port);
-  icsc.registerCommand(ICSC_CATCH_ALL, &__icscReceiver);
+  icsc.registerCommand(ICSC_CATCH_ALL, __icscReceiver);
   icsc.setDePin(enablePin);
   icsc.begin();
 }
