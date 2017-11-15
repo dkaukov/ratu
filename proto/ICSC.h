@@ -544,16 +544,8 @@ boolean ICSC::process()
                       #else
                         for (i=0; i<MAX_COMMANDS; i++) {
                       #endif
-                          Serial.print("i=");
-                          Serial.print(i);
-                          Serial.print(", _commands[i].commandCode=");
-                          Serial.print(_commands[i].commandCode, DEC);
-                          Serial.print(",_commands[i].callback=");
-                          Serial.println((uint16_t)_commands[i].callback, HEX);
                           if ((_commands[i].commandCode == _recCommand) || (_commands[i].commandCode == ICSC_CATCH_ALL)) {
-                            Serial.println("command code valid.");
                             if (_commands[i].callback != NULL) {
-                              Serial.println("callback valid.");
                               Serial.println("Callback");
                               _commands[i].callback(_recSender, _recCommand, _recLen, _data);
                               Serial.println("after Callback");

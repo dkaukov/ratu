@@ -77,6 +77,10 @@ PROTO_Receiver __rcv = NULL;
 void __icscReceiver(uint8_t sender, char cmd, uint8_t length, uint8_t *payload) {
   Serial.print("__icscReceiver sender=");
   Serial.print(sender, DEC);
+  Serial.print(", cmd=");
+  Serial.print(cmd, DEC);
+  Serial.print(", sizeof(TCommand)=");
+  Serial.print(sizeof(TCommand), DEC);
   Serial.print(", length=");
   Serial.println(length, DEC);
   if (length <= sizeof(TCommand) && __rcv != NULL) {
@@ -86,6 +90,7 @@ void __icscReceiver(uint8_t sender, char cmd, uint8_t length, uint8_t *payload) 
 }
 
 inline void busInit(PROTO_Receiver rcv, uint8_t enablePin, Stream *serial_port) {
+  __rcv = rcv;
   icsc.setStream(serial_port);
   icsc.registerCommand(ICSC_CATCH_ALL, __icscReceiver);
   icsc.setDePin(enablePin);
