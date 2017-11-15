@@ -109,7 +109,7 @@ inline boolean mechCalibrate(uint8_t ch) {
 inline boolean halSendStatusUpdate(PROTO_MechStatus &status) {
   TCommand cmd = { .id = cmdStatus };
   cmd.status = status;
-  return icsc.broadcast(cmdStatus, sizeof(cmd.status) + sizeof(cmd.id), (char *) &cmd);
+  return icsc.send(ID_HAL100, cmdStatus, sizeof(cmd.status) + sizeof(cmd.id), (char *) &cmd);
 }
 
 inline boolean halSendStatusUpdateReply(PROTO_MechStatus &status) {
