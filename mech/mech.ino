@@ -221,6 +221,7 @@ void sendStatusUpdates() {
 		{
 			lastRefreshTime = millis();
 			updateStatus();
+			halSendStatusUpdate(status);
 		}
 }
 

@@ -467,7 +467,7 @@ void keypadEvent(KeypadEvent eKey) {
 
 void loop() {
   busLoop();
-  sendStatusRequest();
+  //sendStatusRequest();
 
   key = keypad.getKey();
 
