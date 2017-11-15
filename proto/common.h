@@ -16,7 +16,7 @@ enum {
 };
 
 enum {
-  cmdCalibrate, cmdSetPos, cmdStatus, cmdAutoTune, cmdFineTune, cmdDebug, cmdStatusReq
+  cmdCalibrate = 0x10, cmdSetPos, cmdStatus, cmdAutoTune, cmdFineTune, cmdDebug, cmdStatusReq
 };
 
 typedef struct PROTO_AbsPosParams {
