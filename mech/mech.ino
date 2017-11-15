@@ -158,7 +158,7 @@ void yeld() {
 }
 
 void optimize(AccelStepper *chanel, int16_t step, int16_t hysteresis) {
-  boolean isFirstStep = true;
+  uint8_t stepCount = 0;
   yeld();
   uint16_t prevSetepPwr = rflPwrPercent;
   while (step != 0) {
@@ -166,16 +166,20 @@ void optimize(AccelStepper *chanel, int16_t step, int16_t hysteresis) {
     yeld();
     if (prevSetepPwr < (rflPwrPercent + hysteresis)) {
       step = -step;
-      if (!isFirstStep) {
+      if (stepCount != 0) {
         step = step >> 1;
+      } else {
+        dprintf("optimize() - wrong direction of 1st step\n");
       }
     }
     prevSetepPwr = rflPwrPercent;
     if (((fwdPwrVal >> 4) == 0) || ((rflPwrVal >> 4) == 0)) {
+      dprintf("optimize() - aborting due power conditions\n");
       break;
     }
-    isFirstStep = false;
+    stepCount++;
   }
+  dprintf("optimize() - finished in %d step(s)\n", stepCount);
 }
 
 void autoTune() {
@@ -189,9 +193,11 @@ void autoTune() {
   stepperC1.moveTo(10);
   stepperC2.moveTo(10);
   optimize(&stepperL, 2000, 0);
+  dprintf("autoTune() - stepperL finished in %8d uSec\n", micros() - startedTime);
   optimize(&stepperC1, 20, 0);
+  dprintf("autoTune() - stepperC1 finished in %8d uSec\n", micros() - startedTime);
   optimize(&stepperC2, 20, 0);
-  dprintf("autoTune() - finished in %8d usec\n", micros() - startedTime);
+  dprintf("autoTune() - stepperC2 finished in %8d uSec\n", micros() - startedTime);
   isAutoTune = 0;
 }
 
