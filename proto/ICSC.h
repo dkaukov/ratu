@@ -91,8 +91,13 @@
 //Increase or decrease the number to your needs
 #define ICSC_SOH_START_COUNT 1
 
-// Format of command callback functions
-typedef void(*callbackFunction)(unsigned char, char, unsigned char, char *);
+
+typedef void (* callbackFunction)(
+  uint8_t sender,
+  char cmd,
+  uint8_t len,
+  uint8_t *payload
+);
 
 // Structure to store command code / function pairs
 typedef struct {
@@ -542,9 +547,9 @@ boolean ICSC::process()
                           Serial.print("i=");
                           Serial.print(i);
                           Serial.print(", _commands[i].commandCode=");
-                          Serial.print(_commands[i].commandCode);
+                          Serial.print(_commands[i].commandCode, DEC);
                           Serial.print(",_commands[i].callback=");
-                          Serial.println(_commands[i].commandCode, HEX);
+                          Serial.println((uint16_t)_commands[i].callback, HEX);
 
                             if ((_commands[i].commandCode == _recCommand ||
                                  _commands[i].commandCode == ICSC_CATCH_ALL )
