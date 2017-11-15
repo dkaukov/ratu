@@ -424,6 +424,11 @@ boolean ICSC::process()
         // saw any activity on the line
         _lastByteSeen = millis();
 
+        Serial.print("inch=");
+        Serial.print(inch);
+        Serial.print(", _recPhase=");
+        Serial.println(_recPhase);
+
         switch(_recPhase) {
 
             // Case 0 looks for the header.  Bytes arrive in the serial interface and get
