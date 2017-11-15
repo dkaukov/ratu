@@ -424,11 +424,6 @@ boolean ICSC::process()
         // saw any activity on the line
         _lastByteSeen = millis();
 
-        Serial.print("inch=");
-        Serial.print(inch, HEX);
-        Serial.print(", _recPhase=");
-        Serial.println(_recPhase);
-
         switch(_recPhase) {
 
             // Case 0 looks for the header.  Bytes arrive in the serial interface and get
@@ -544,6 +539,13 @@ boolean ICSC::process()
                       #else
                         for (i=0; i<MAX_COMMANDS; i++) {
                       #endif
+                          Serial.print("i=");
+                          Serial.print(i);
+                          Serial.print(", _commands[i].commandCode=");
+                          Serial.print(_commands[i].commandCode);
+                          Serial.print(",_commands[i].callback=");
+                          Serial.println(_commands[i].commandCode, HEX);
+
                             if ((_commands[i].commandCode == _recCommand ||
                                  _commands[i].commandCode == ICSC_CATCH_ALL )
                                && _commands[i].callback)
