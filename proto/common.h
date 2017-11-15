@@ -83,7 +83,7 @@ void __icscReceiver(uint8_t sender, char cmd, uint8_t length, char *payload) {
 
 inline void busInit(PROTO_Receiver rcv, uint8_t enablePin, Stream *serial_port) {
   icsc.setStream(serial_port);
-  icsc.registerCommand(ICSC_CATCH_ALL, __icscReceiver);
+  icsc.registerCommand(ICSC_CATCH_ALL, &__icscReceiver);
   icsc.setDePin(enablePin);
   icsc.begin();
 }
