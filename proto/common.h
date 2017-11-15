@@ -75,6 +75,10 @@ typedef void (*PROTO_Receiver)(const TCommand *payload);
 PROTO_Receiver __rcv = NULL;
 
 void __icscReceiver(uint8_t sender, char cmd, uint8_t length, uint8_t *payload) {
+  Serial.print("__icscReceiver sender=");
+  Serial.print(sender, DEC);
+  Serial.print(", length=");
+  Serial.println(length, DEC);
   if (length <= sizeof(TCommand) && __rcv != NULL) {
     Serial.println("Intrnal Callback");
     __rcv((TCommand *) payload);
