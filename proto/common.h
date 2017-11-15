@@ -36,12 +36,6 @@ typedef struct PROTO_AdcValues {
   uint16_t rfl;
 } PROTO_AdcValues;
 
-typedef struct PROTO_StringValue {
-  uint8_t len;
-  char str[32];
-} PROTO_StringValue;
-
-
 typedef struct PROTO_CalParams {
   uint8_t channel;
 } PROTO_CalParams;
@@ -54,12 +48,10 @@ typedef struct PROTO_MechStatus {
 } PROTO_MechStatus;
 
 typedef struct TCommand {
-  uint8_t id;
   union {
     PROTO_CalParams cal;
     PROTO_DeltaPosParams pos;
     PROTO_MechStatus status;
-    PROTO_StringValue str;
   };
 } TCommand;
 
@@ -70,13 +62,13 @@ typedef struct TCommand {
 
 ICSC icsc(PJON_ID);
 
-typedef void (*PROTO_Receiver)(const TCommand *payload);
+typedef void (*PROTO_Receiver)(char cmd, const TCommand *payload);
 
 PROTO_Receiver __rcv = NULL;
 
 void __icscReceiver(uint8_t sender, char cmd, uint8_t length, uint8_t *payload) {
   if (length <= sizeof(TCommand) && __rcv != NULL) {
-    __rcv((TCommand *) payload);
+    __rcv(cmd, (TCommand *) payload);
   }
 }
 
@@ -93,45 +85,37 @@ inline void busLoop() {
 }
 
 inline boolean mechSetPosition(int16_t l, int16_t c1, int16_t c2) {
-  TCommand cmd = { .id = cmdSetPos };
+  TCommand cmd = {};
   cmd.pos.lPos = l;
   cmd.pos.c1Pos = c1;
   cmd.pos.c2Pos = c2;
-  return icsc.send(ID_MECH, cmdSetPos, sizeof(cmd.pos) + sizeof(cmd.id), (char *) &cmd);
+  return icsc.send(ID_MECH, cmdSetPos, sizeof(cmd.pos), (char *) &cmd);
 }
 
 inline boolean mechCalibrate(uint8_t ch) {
-  TCommand cmd = { .id = cmdCalibrate };
+  TCommand cmd = {};
   cmd.cal.channel = ch;
-  return icsc.send(ID_MECH, cmdCalibrate, sizeof(cmd.cal) + sizeof(cmd.id), (char *) &cmd);
+  return icsc.send(ID_MECH, cmdCalibrate, sizeof(cmd.cal), (char *) &cmd);
 }
 
 inline boolean halSendStatusUpdate(PROTO_MechStatus &status) {
-  TCommand cmd = { .id = cmdStatus };
-  cmd.status = status;
-  return icsc.send(ID_HAL100, cmdStatus, sizeof(cmd.status) + sizeof(cmd.id), (char *) &cmd);
+  return icsc.send(ID_HAL100, cmdStatus, sizeof(PROTO_MechStatus), (char *) &status);
 }
 
 inline boolean halSendStatusUpdateReply(PROTO_MechStatus &status) {
-  TCommand cmd = { .id = cmdStatus };
-  cmd.status = status;
-  return icsc.send(ID_HAL100, cmdStatus, sizeof(cmd.status) + sizeof(cmd.id), (char *) &cmd);
+  return icsc.send(ID_HAL100, cmdStatus, sizeof(PROTO_MechStatus), (char *) &status);
 }
 
-
 inline boolean mechAutoTune() {
-  TCommand cmd = { .id = cmdAutoTune };
-  return icsc.send(ID_MECH, cmdAutoTune, sizeof(cmd.id), (char *) &cmd);
+  return icsc.send(ID_MECH, (char) cmdAutoTune);
 }
 
 inline boolean mechFineTune() {
-  TCommand cmd = { .id = cmdFineTune };
-  return icsc.send(ID_MECH, cmdFineTune, sizeof(cmd.id), (char *) &cmd);
+  return icsc.send(ID_MECH, (char) cmdFineTune);
 }
 
 inline boolean mechSendStatusRequest() {
-  TCommand cmd = { .id = cmdStatusReq };
-  return icsc.send(ID_MECH, cmdStatusReq, sizeof(cmd.id), (char *) &cmd);
+  return icsc.send(ID_MECH, (char) cmdStatusReq);
 }
 
 

@@ -4,6 +4,8 @@
 // Motor C: 200 steps 360 degrees revolution (no gear). In quater-step mode 800 steps 360 degrees revolution (no gear). 
 // Measured 2964 steps 360 degrees revolution.
 
+#define MECH_DEBUG
+
 #include "proto/device_id.h"  // communication protocol device ID 
 #include <AccelStepper.h>     // Accel Stepper library
 
@@ -11,6 +13,7 @@
 #include "proto/common.h"     // communication protocol library
 
 #include "adc.h"
+#include "debug.h"
 
 AccelStepper stepperL  = AccelStepper(1, 3, 4);  // Custom pinout "L" - Step to D3, Dir to D4 (Default AccelStepper::FULL4WIRE (4 pins) on 2, 3, 4, 5)
 AccelStepper stepperC1 = AccelStepper(1, 5, 6);  // Custom pinout "C1" - Step to D5, Dir to D6 (Default AccelStepper::FULL4WIRE (4 pins) on 2, 3, 4, 5)
@@ -65,8 +68,8 @@ inline void driversDisable() {
   isDriversEnabled = 0;
 }
 
-void busReceiver(const TCommand *payload) {
-	switch (payload->id) {
+void busReceiver(char cmd, const TCommand *payload) {
+	switch (cmd) {
 	case cmdCalibrate:
 	  driversEnable();
 		switch (payload->cal.channel) {
@@ -105,6 +108,7 @@ void setup() {
   Serial.begin(TS_PORT_BITRATE);
   busInit(busReceiver, 2, &Serial);
   adcInit();
+  debugInit();
 
   pinMode(driverEnablePin, OUTPUT);
   digitalWrite(driverEnablePin, LOW);
@@ -176,14 +180,18 @@ void optimize(AccelStepper *chanel, int16_t step, int16_t hysteresis) {
 
 void autoTune() {
   if (((fwdPwrVal >> 4) == 0) || (isAutoTune)) {
+    dprintf("autoTune() - rejected\n");
     return;
   }
+  unsigned long startedTime = micros();
+  dprintf("autoTune() - started\n");
   isAutoTune = 1;
   stepperC1.moveTo(10);
   stepperC2.moveTo(10);
   optimize(&stepperL, 2000, 0);
   optimize(&stepperC1, 20, 0);
   optimize(&stepperC2, 20, 0);
+  dprintf("autoTune() - finished in %8d usec\n", micros() - startedTime);
   isAutoTune = 0;
 }
 
