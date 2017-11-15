@@ -550,19 +550,16 @@ boolean ICSC::process()
                           Serial.print(_commands[i].commandCode, DEC);
                           Serial.print(",_commands[i].callback=");
                           Serial.println((uint16_t)_commands[i].callback, HEX);
+                          if ((_commands[i].commandCode == _recCommand) || (_commands[i].commandCode == ICSC_CATCH_ALL)) {
+                            Serial.println("command code valid.");
+                            if (_commands[i].callback != NULL) {
+                              Serial.println("callback valid.");
+                              Serial.println("Callback");
+                              _commands[i].callback(_recSender, _recCommand, _recLen, _data);
+                              Serial.println("after Callback");
 
-                            if ((_commands[i].commandCode == _recCommand ||
-                                 _commands[i].commandCode == ICSC_CATCH_ALL )
-                               && _commands[i].callback)
-                            {
-                                Serial.println("Callback");
-                                _commands[i].callback(_recSender, _recCommand, _recLen, _data);
-                                Serial.println("after Callback");
-                                #ifndef ICSC_NO_STATS
-                                _stats.cb_run++;
-                                #endif
-                                cbok = 1;
                             }
+                          }
                         }
                #ifndef ICSC_NO_STATS
                         if (cbok == 0) {
