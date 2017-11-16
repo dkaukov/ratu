@@ -51,8 +51,6 @@ boolean isBusy = false;
 
 // char array
 
-char enteredFreq[6];
-char tuningFreq[6];
 char key;
 char DisplayValueC1[6];
 char DisplayValueC1pF[6];
@@ -62,20 +60,7 @@ char DisplayValueL[6];
 char DisplayValueLUH[4];
 char DisplayValueSWR[6];
 char input; //buffer for input characters for calculations
-// char dataPrintout[10];
 
-// float tuningFreqCalc = 0;   // float for value C calculation
-// float KHz;                  // KHz constant
-// float PlanckTime;           // Planck constant
-// float pi;                   // π constant
-// float valueC1 = 0;           // calculated value C float
-// float valueCEffective = 0;  // calculated value C float
-// float valueL = 0;           // calculated value L float
-// float valueC1Corr = 0;      // calculated value C1 float
-// float valueC2Corr = 0;      // calculated value C1 float
-// float valueLcorr = 0;       // calculated value L float
-// float Cmult;                // constant multiplier to calculate C value
-// float Lmult;                // constant multiplier to calculate L value
 float valueRotateC1 = -1;
 float valueRotateC2 = -1;
 float valueRotateL = -1;
@@ -84,7 +69,6 @@ float stepsToMhFloat;
 
 boolean presentValue = false;
 
-String EnteredFreqString, TuningFreqString;
 String DisplayValueLstring;
 
 int i;
@@ -180,28 +164,6 @@ void displayInitialScreen() {                      // displays "Wait Calibrating
   keypad.addEventListener(keypadEvent);             //add an event listener for this keypad
 }
 
-//void SetFrequencyStage1() {
-// STAGE 1 tuning process
-//	calculateC();                                     // calculate C value at selected frequency
-//	calculateStepsC();                                // calculate steps needed to move C to value C
-//	CmoveStage1();                                    // send command to nano to move motor "C" to C step value
-//	calculateL();                                     // calculate L value at given frequency and C value
-//	calculateStepsL();                                // calculate steps needed to move C to value L
-//	LmoveStage1();                                    // send command to nano to move motor "L" to L step value
-//	EraseDisplayC1(), EraseDisplayL();                 // clear previous values L and C at display
-//	displayC1(), displayL();                           // display current values L and C at display
-//	mechSetPosition(round (valueRotateL), round (valueRotateC1), round (valueRotateC2));
-// End STAGE 1 tuning process
-//}
-
-// Pre-STAGE 1 (coarse tuning process) cleanups and displays - will be used later
-//void SetFrequency() {                               // when # pressed - sets frequency value at the bottom of the screen
-//  eraseFreqTopScreen();                             // clear previously entered drequesncy at display top
-//  eraseEnteredFrequency();                          // clear entered frequency at display bottom
-//  displayFreqTopScreen();                           // display desired frequesncy at display top
-//  SetFrequencyStage1();
-//}
-
 
 void incL(float diff) {                             // rotate motor L with number of steps
   mechSetPosition(round (diff), 0, 0);
@@ -214,55 +176,6 @@ void incC1(float diff) {                            // rotate motor C1 Cold with
 void incC2(float diff) {                            // rotate motor C2 Hot with number of steps
   mechSetPosition(0, 0, round(diff));
 }
-
-// void incLCorr(float diff) {
-//    if (tuningFreqCalc != 0.0) {
-//      valueLcorr = valueLcorr + diff;
-//      SetFrequencyStage1();
-//    }
-//}
-
-//void incC1Corr(float diff) {
-//    if (tuningFreqCalc != 0.0) {
-//      valueC1Corr = valueC1Corr + diff;
-//      SetFrequencyStage1();
-//    }
-//}
-
-//void incC2Corr(float diff) {
-//    if (tuningFreqCalc != 0.0) {
-//      valueC2Corr = valueC2Corr + diff;
-//      SetFrequencyStage1();
-//    }
-//}
-
-//void eraseFreqTopScreen() {                      // erases frequency value from top of display
-//  TFTscreen.stroke(0, 20, 30);
-//  TFTscreen.setTextSize(2);
-//  TFTscreen.text(tuningFreq, 50, 110);
-//  TuningFreqString = "";
-//}
-
-//void displayFreqTopScreen() {                   // shows frequency value at top of display font 4
-//  TuningFreqString = EnteredFreqString;
-//  TuningFreqString.toCharArray(tuningFreq, 6);
-//  EnteredFreqString = "";
-//  TFTscreen.stroke(255, 255, 0);
-//  TFTscreen.setTextSize(2);
-//  TFTscreen.text(tuningFreq, 50, 110);
-//}
-
-//void displayTunedFreqTopScreen() {             // Display tuningFreq at the top of the screen in "green tuned mode"
-//  TFTscreen.stroke(0, 255, 0);
-//  TFTscreen.setTextSize(2);
-//  TFTscreen.text(tuningFreq, 50, 110);
-//}
-
-//void eraseEnteredFrequency () {               // erase frequency value at the botton of the screen
-//  TFTscreen.setTextSize(2);
-//  TFTscreen.stroke(0, 20, 30);
-//  TFTscreen.text(enteredFreq, 50, 110);
-//}
 
 void displaySWRvalue() {                                    // process to display SWR values
   EraseDisplaySWR();
@@ -456,99 +369,6 @@ void EraseDisplayC2() {                                        // erase C1 value
   EraseDisplayC2steps();
   ErasDisplayValueC2pF();
 }
-
-
-//void displayC2() {                                       // display C2 steps values
-//  dtostrf(valueRotateC2, 5, 0, DisplayValueC2);
-//  if (isBusy) {
-//    TFTscreen.stroke(255, 255, 0);
-//  } else {
-//    TFTscreen.stroke(0, 255, 0);
-//  }
-//  TFTscreen.setTextSize(2);
-//  TFTscreen.text(DisplayValueC2, 40, 85);
-//}
-
-//void EraseDisplayC2() {                                   // erase display C2 steps values
-//  TFTscreen.stroke(0, 20, 20);
-//  TFTscreen.setTextSize(2);
-//  TFTscreen.text(DisplayValueC2, 40, 85);
-//}
-
-//void eraseFrequency() {                         // when * pressed - erases entered frequency bottom of the screen
-//  EnteredFreqString = "";
-//  TuningFreqString = "";
-//  TFTscreen.stroke(0, 20, 30);
-//  TFTscreen.setTextSize(2);
-//  TFTscreen.text(enteredFreq, 50, 110);
-//}
-
-//void tuningDisplay() {
-//  for (i = 0; i < 4; i++) {
-//    TFTscreen.stroke(255, 255, 0);
-//    TFTscreen.setTextSize(1);
-//    TFTscreen.text("TUNING", 50, 45);
-//    delay(1000);
-//    TFTscreen.stroke(0, 20, 30);
-//    TFTscreen.text("TUNING", 50, 45);
-//    delay(500);
-//  }
-//}
-
-//void calculateC() {                             // Calculate value C from entered frequency: C = 299792458 / (tuningFreq * 1000)
-//  Serial.println(tuningFreq);
-//  tuningFreqCalc = atof(tuningFreq);  // convert Freq input character array to a float
-//  KHz = 1000;
-//  PlanckTime = 299792458;
-//  Cmult = 1.5;
-//  valueCEffective = PlanckTime / ( tuningFreqCalc * KHz ) * Cmult;
-//  valueC1 = valueCEffective + valueC1Corr;
-//  Serial.print("Value C1 pF=");
-//  Serial.println(valueC1);
-//}
-
-//void calculateL () {                            // Calculate "L" value from formula L=((1/(2*π*f*C))/(2*π*f))*1000000000000 (where f in KHz and C in pF)
-//  pi = 3.14159;
-//  Lmult = 1000000000000;
-//  valueL = ((1 / (2 * pi * tuningFreqCalc * (valueCEffective))) / (2 * pi * tuningFreqCalc)) * Lmult + valueLcorr;
-//  Serial.print("Value L uH=");
-//  Serial.println(valueL);
-//}
-
-//void calculateStepsC() {                        // calculate needed steps for C
-// Process for linear capacitor with 44-408 pF - need to ajust or change for different capacitor
-//  float totalStepsC = 2964;
-//  float pFmin = 20;
-//  float pFmax = 200;
-// float pFtotalValue = pFmax - pFmin;
-//  Serial.println(pFtotalValue);
-//  float pFperStep = pFtotalValue / ( totalStepsC / 2 );
-//  Serial.println(pFperStep);
-//  valueRotateC1 = ( valueC1 - pFmin ) / pFperStep;
-//  Serial.print("steps C to rotate=");
-//  Serial.println(valueRotateC1);
-//}
-
-//void CmoveStage1() {                            // Send commandn to move motor C
-//  send syntax '2,valueRotateC;' to Nano
-//}
-
-//void calculateStepsL() {                        // calculate needed steps for L
-// Process for non-linear variable inductor - need to ajust or change for different inductor
-// y = -0.0299x2 + 1.3867x + 0.5894
-// float totalStepsL = 2964;                                                              // total motor steps for 1 rotation
-// float LturnsRequred = ( -0.0299 * valueL * valueL ) + ( 1.3867 * valueL ) + 0.5894;    // poly math
-// valueRotateL = LturnsRequred * totalStepsL;
-// Serial.print("L turns requred=");
-// Serial.println(LturnsRequred);
-// Serial.print("steps L to rotate=");
-// Serial.println(valueRotateL);
-//}
-
-//void LmoveStage1() {                            // Send commandn to move motor L
-//  send syntax '1,valueRotateL;' to Nano
-//}
-
 
 void sendStatusRequest() {
   static const unsigned long REFRESH_INTERVAL = 100; // ms
