@@ -46,7 +46,13 @@ const unsigned char bell [] PROGMEM = {
 // create an instance of the TFT library
 TFT TFTscreen = TFT(cs, dc, rst);
 
-boolean displayRefresh = false;
+#define DISPLAY_REFRESH_L   0x01
+#define DISPLAY_REFRESH_C1  0x02
+#define DISPLAY_REFRESH_C2  0x04
+#define DISPLAY_REFRESH_SWR 0x08
+#define DISPLAY_REFRESH_BSY 0x10
+
+uint8_t displayRefreshFlags = 0;
 boolean isBusy = false;
 
 // char array
@@ -104,24 +110,31 @@ Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
 void busReceiver(char cmd, uint8_t length, const TCommand *payload) {
   switch (cmd) {
     case cmdStatus: {
-        Serial.print("cnt=");
-        Serial.print(payload->status.cnt);
-        Serial.print(", Value fwd=");
-        Serial.print(payload->status.adc.fwd);
-        Serial.print(", Value rfl=");
-        Serial.println(payload->status.adc.rfl);
-
         float rfl = payload->status.adc.rfl;
         float fwd = payload->status.adc.fwd;
         float p = (rfl / fwd);
-        valueSWR = (1 + p) / (1 - p);
-
-        valueRotateL = payload->status.pos.lPos;
-        valueRotateC1 = payload->status.pos.c1Pos;
-        valueRotateC2 = payload->status.pos.c2Pos;
-        isBusy = payload->status.flags > 0;
-
-        displayRefresh = true;
+        float swr = (1 + p) / (1 - p);
+        if (swr != valueSWR) {
+          valueSWR = (1 + p) / (1 - p);
+          displayRefreshFlags |= DISPLAY_REFRESH_SWR;
+        }
+        if (valueRotateL != payload->status.pos.lPos) {
+          valueRotateL = payload->status.pos.lPos;
+          displayRefreshFlags |= DISPLAY_REFRESH_L;
+        }
+        if (valueRotateC1 != payload->status.pos.c1Pos) {
+          valueRotateC1 = payload->status.pos.c1Pos;
+          displayRefreshFlags |= DISPLAY_REFRESH_C1;
+        }
+        if (valueRotateC2 != payload->status.pos.c2Pos) {
+          valueRotateC2 = payload->status.pos.c2Pos;
+          displayRefreshFlags |= DISPLAY_REFRESH_C2;
+        }
+        boolean bsy = payload->status.flags & (1 << 3);
+        if (isBusy != bsy) {
+          isBusy = bsy;
+          displayRefreshFlags |= DISPLAY_REFRESH_BSY;
+        }
         break;
       }
     case cmdDebug: {
@@ -451,31 +464,38 @@ void loop() {
       */
     }
   }
-  if (displayRefresh) {
+  if (displayRefreshFlags != 0) {
 
-    displaySWRvalue();
-
-    EraseDisplayL();
-    displayL();
-
-    EraseDisplayC1();
-    displayC1();
-
-    EraseDisplayC2();
-    displayC2();
-
-    if (!isBusy) {
-      TFTscreen.stroke(255, 255, 0);                  // set the font color
-      digitalWrite(40, LOW);
-    } else {
-      TFTscreen.stroke(0, 20, 20);
-      digitalWrite(40, HIGH);
+    if ((displayRefreshFlags & DISPLAY_REFRESH_SWR) != 0) {
+      displaySWRvalue();
+      displayRefreshFlags &= ~DISPLAY_REFRESH_SWR;
     }
-    TFTscreen.setTextSize(1);
-    TFTscreen.text("Ready", 50, 115);                // write the text to coordinates
-
-    displayRefresh = false;
+    if ((displayRefreshFlags & DISPLAY_REFRESH_L) != 0) {
+      EraseDisplayL();
+      displayL();
+      displayRefreshFlags &= ~DISPLAY_REFRESH_L;
+    }
+    if ((displayRefreshFlags & DISPLAY_REFRESH_C1) != 0) {
+      EraseDisplayC1();
+      displayC1();
+      displayRefreshFlags &= ~DISPLAY_REFRESH_C1;
+    }
+    if ((displayRefreshFlags & DISPLAY_REFRESH_C2) != 0) {
+      EraseDisplayC2();
+      displayC2();
+      displayRefreshFlags &= ~DISPLAY_REFRESH_C2;
+    }
+    if ((displayRefreshFlags & DISPLAY_REFRESH_BSY) != 0) {
+      if (!isBusy) {
+        TFTscreen.stroke(255, 255, 0);                  // set the font color
+        digitalWrite(40, LOW);
+      } else {
+        TFTscreen.stroke(0, 20, 20);
+        digitalWrite(40, HIGH);
+      }
+      TFTscreen.setTextSize(1);
+      TFTscreen.text("Ready", 50, 115);                // write the text to coordinates
+      displayRefreshFlags &= ~DISPLAY_REFRESH_BSY;
+    }
   }
-
-
 }
