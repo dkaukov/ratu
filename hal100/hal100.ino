@@ -52,13 +52,13 @@ boolean isBusy = false;
 // char array
 
 char key;
-char DisplayValueC1[6];
-char DisplayValueC1pF[6];
-char DisplayValueC2[6];
-char DisplayValueC2pF[6];
-char DisplayValueL[6];
-char DisplayValueL1uH[6];
-char DisplayValueSWR[6];
+char DisplayValueC1[10];
+char DisplayValueC1pF[10];
+char DisplayValueC2[10];
+char DisplayValueC2pF[10];
+char DisplayValueL[10];
+char DisplayValueL1uH[10];
+char DisplayValueSWR[10];
 char input; //buffer for input characters for calculations
 
 float valueRotateC1 = -1;
@@ -195,21 +195,16 @@ void EraseDisplaySWR() {                                   // erase display SWR 
   TFTscreen.text(DisplayValueSWR, 40, 5);
 }
 
-
-double stepsToUH(float x) {
-  return  3.2408606623203362e-001 * pow(x, 0)
-          +  4.8175734249036963e-005 * pow(x, 1)
-          + -8.2394558534492893e-009 * pow(x, 2)
-          +  4.1381892772191581e-012 * pow(x, 3)
-          + -5.0628320718901775e-016 * pow(x, 4)
-          +  3.2564586259750260e-020 * pow(x, 5)
-          + -1.1101886921087241e-024 * pow(x, 6)
-          +  1.3237902692887521e-029 * pow(x, 7)
-          +  3.9488291689952899e-034 * pow(x, 8)
-          + -1.8793946779017113e-038 * pow(x, 9)
-          +  3.2823426065013548e-043 * pow(x, 10)
-          + -2.7820892583909193e-048 * pow(x, 11)
-          +  9.4929814793314678e-054 * pow(x, 12);
+double stepsToUH(double x) {
+   return  3.2984940709870936e-001 * pow(x,0)
+        +  2.5621377247607574e-005 * pow(x,1)
+        +  7.3269703268229895e-009 * pow(x,2)
+        +  1.7411736893707688e-013 * pow(x,3)
+        + -1.9811135781400833e-017 * pow(x,4)
+        +  6.3890319515881330e-022 * pow(x,5)
+        + -9.2196784942118622e-027 * pow(x,6)
+        +  4.9627745914218940e-032 * pow(x,7)
+        +  7.0123651511795207e-039 * pow(x,8);
 }
 
 void displayLSteps() {                                         // display L steps values
