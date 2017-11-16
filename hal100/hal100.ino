@@ -55,7 +55,9 @@ char enteredFreq[6];
 char tuningFreq[6];
 char key;
 char DisplayValueC1[6];
+char DisplayValueC1pH[6];
 char DisplayValueC2[6];
+char DisplayValueC2pH[6];
 char DisplayValueL[6];
 char DisplayValueLUH[4];
 char DisplayValueSWR[6];
@@ -169,7 +171,7 @@ void displayInitialScreen() {                      // displays "Wait Calibrating
   // Displays C1
   TFTscreen.stroke(0, 255, 0);                      // set the font color
   TFTscreen.setTextSize(2);                         // set the font size 2
-  TFTscreen.text("C1", 5, 65);                     // write the text to coordinates
+  TFTscreen.text("C1", 5, 55);                     // write the text to coordinates
   // Displays C2
   TFTscreen.stroke(0, 255, 0);                      // set the font color
   TFTscreen.setTextSize(2);                         // set the font size 2
@@ -197,7 +199,7 @@ void displayInitialScreen() {                      // displays "Wait Calibrating
 //  eraseFreqTopScreen();                             // clear previously entered drequesncy at display top
 //  eraseEnteredFrequency();                          // clear entered frequency at display bottom
 //  displayFreqTopScreen();                           // display desired frequesncy at display top
-  //  SetFrequencyStage1();
+//  SetFrequencyStage1();
 //}
 
 
@@ -301,7 +303,7 @@ void displayValueLuH() {                                         // display L va
   dtostrf(stepsToMh(valueRotateL), 4, 2, DisplayValueLUH);
   if (isBusy) {
     TFTscreen.stroke(255, 255, 0);
-  } else {  
+  } else {
     TFTscreen.stroke(0, 255, 0);
   }
   TFTscreen.setTextSize(2);
@@ -314,35 +316,75 @@ void ErasDisplayValueLuH() {                                   // erase display 
   TFTscreen.text(DisplayValueLUH, 40, 25);
 }
 
-void displayL() {                                             // display L steps and uH 
-  displayLSteps();  
-  displayValueLuH();                                    
+void displayL() {                                             // display L steps and uH
+  displayLSteps();
+  displayValueLuH();
 }
 
 void EraseDisplayL() {                                        // erase L steps and uH
-  EraseDisplayLSteps();  
-  ErasDisplayValueLuH();                                    
+  EraseDisplayLSteps();
+  ErasDisplayValueLuH();
 }
 
+ double stepsC1topH(double x) {
+   return  3.5215908593183684e+002 * pow(x,0)
+        + -1.6245967367326516e-001 * pow(x,1)
+        + -8.9757122524750620e-004 * pow(x,2)
+        +  5.3372752892602197e-006 * pow(x,3)
+        + -1.7696527557016530e-008 * pow(x,4)
+        +  3.3363571963309934e-011 * pow(x,5)
+        + -3.6438105893235793e-014 * pow(x,6)
+        +  2.2733846666230038e-017 * pow(x,7)
+        + -7.5016703085658784e-021 * pow(x,8)
+        +  1.0154127876671653e-024 * pow(x,9);
+}
 
-void displayC1() {                                       // display C values
+void displayC1steps() {                                       // display C1 steps values
   dtostrf(valueRotateC1, 5, 0, DisplayValueC1);
   if (isBusy) {
     TFTscreen.stroke(255, 255, 0);
   } else {
     TFTscreen.stroke(0, 255, 0);
   }
-  TFTscreen.setTextSize(2);
-  TFTscreen.text(DisplayValueC1, 40, 65);
+  TFTscreen.setTextSize(1);
+  TFTscreen.text(DisplayValueC1, 55, 70);
 }
 
-void EraseDisplayC1() {                                   // erase display C values
+void EraseDisplayC1steps() {                                   // erase display C1 steps values
   TFTscreen.stroke(0, 20, 20);
-  TFTscreen.setTextSize(2);
-  TFTscreen.text(DisplayValueC1, 40, 65);
+  TFTscreen.setTextSize(1);
+  TFTscreen.text(DisplayValueC1, 55, 70);
 }
 
-void displayC2() {                                       // display C values
+void displayValueC1pH() {                                         // display C1 values in pH
+  dtostrf(stepsC1topH(valueRotateC1), 4, 1, DisplayValueC1pH);
+  if (isBusy) {
+    TFTscreen.stroke(255, 255, 0);
+  } else {
+    TFTscreen.stroke(0, 255, 0);
+  }
+  TFTscreen.setTextSize(2);
+  TFTscreen.text(DisplayValueC1pH, 40, 55);
+}
+
+void ErasDisplayValueC1pH() {                                   // erase display C1 values in pH
+  TFTscreen.stroke(0, 20, 30);
+  TFTscreen.setTextSize(2);
+  TFTscreen.text(DisplayValueC1pH, 40, 55);
+}
+
+void displayC1() {                                             // display C1 values
+  displayC1steps();
+  displayValueC1pH();
+}
+
+void EraseDisplayC1() {                                        // erase C1 values
+  EraseDisplayC1steps();
+  ErasDisplayValueC1pH();
+}
+
+
+void displayC2() {                                       // display C2 steps values
   dtostrf(valueRotateC2, 5, 0, DisplayValueC2);
   if (isBusy) {
     TFTscreen.stroke(255, 255, 0);
@@ -353,37 +395,37 @@ void displayC2() {                                       // display C values
   TFTscreen.text(DisplayValueC2, 40, 85);
 }
 
-void EraseDisplayC2() {                                   // erase display C values
+void EraseDisplayC2() {                                   // erase display C2 steps values
   TFTscreen.stroke(0, 20, 20);
   TFTscreen.setTextSize(2);
   TFTscreen.text(DisplayValueC2, 40, 85);
 }
 
 double stepsToMh(float x) {
-    return  3.2408606623203362e-001 * pow(x, 0)
-            +  4.8175734249036963e-005 * pow(x, 1)
-            + -8.2394558534492893e-009 * pow(x, 2)
-            +  4.1381892772191581e-012 * pow(x, 3)
-            + -5.0628320718901775e-016 * pow(x, 4)
-            +  3.2564586259750260e-020 * pow(x, 5)
-            + -1.1101886921087241e-024 * pow(x, 6)
-            +  1.3237902692887521e-029 * pow(x, 7)
-            +  3.9488291689952899e-034 * pow(x, 8)
-            + -1.8793946779017113e-038 * pow(x, 9)
-            +  3.2823426065013548e-043 * pow(x, 10)
-            + -2.7820892583909193e-048 * pow(x, 11)
-            +  9.4929814793314678e-054 * pow(x, 12);
-  }
-  
-
-
-void eraseFrequency() {                         // when * pressed - erases entered frequency bottom of the screen
-  EnteredFreqString = "";
-  TuningFreqString = "";
-  TFTscreen.stroke(0, 20, 30);
-  TFTscreen.setTextSize(2);
-  TFTscreen.text(enteredFreq, 50, 110);
+  return  3.2408606623203362e-001 * pow(x, 0)
+          +  4.8175734249036963e-005 * pow(x, 1)
+          + -8.2394558534492893e-009 * pow(x, 2)
+          +  4.1381892772191581e-012 * pow(x, 3)
+          + -5.0628320718901775e-016 * pow(x, 4)
+          +  3.2564586259750260e-020 * pow(x, 5)
+          + -1.1101886921087241e-024 * pow(x, 6)
+          +  1.3237902692887521e-029 * pow(x, 7)
+          +  3.9488291689952899e-034 * pow(x, 8)
+          + -1.8793946779017113e-038 * pow(x, 9)
+          +  3.2823426065013548e-043 * pow(x, 10)
+          + -2.7820892583909193e-048 * pow(x, 11)
+          +  9.4929814793314678e-054 * pow(x, 12);
 }
+
+
+
+//void eraseFrequency() {                         // when * pressed - erases entered frequency bottom of the screen
+//  EnteredFreqString = "";
+//  TuningFreqString = "";
+//  TFTscreen.stroke(0, 20, 30);
+//  TFTscreen.setTextSize(2);
+//  TFTscreen.text(enteredFreq, 50, 110);
+//}
 
 //void tuningDisplay() {
 //  for (i = 0; i < 4; i++) {
@@ -469,9 +511,9 @@ void keypadEvent(KeypadEvent eKey) {
     case PRESSED:
       //    lcd.print(eKey);
       switch (eKey) {
-//        case '#':                           // submit frequesncy
-//          SetFrequency();
-//         break;
+        //        case '#':                           // submit frequesncy
+        //          SetFrequency();
+        //         break;
         case 'c':                           // "C1 Cold" motor move 5 step CCW
           incC1(-1);
           break;
@@ -490,23 +532,15 @@ void keypadEvent(KeypadEvent eKey) {
         case 'U':                           // "L" motor move 100 step CW
           incL(+10.0);
           break;
-        case '*':                           // erase entered frequency
-          eraseFrequency();
-          break;
+///        case '*':                           // erase entered frequency
+//          eraseFrequency();
+//          break;
         case 'S':                           // erase entered frequency
           mechAutoTune();
           break;
         case 'K':                           // erase entered frequency
           mechFineTune();
           break;
-
-          //        case 'U':                           // calibrate both motors
-          //          mechCalibrate(channelC1);
-          //          break;
-          //        case 'D':                           // calibrate both motors
-          //          mechCalibrate(channelL);
-          //          break;
-
       }
   }
 }
