@@ -282,6 +282,23 @@ void EraseDisplaySWR() {                                   // erase display SWR 
   TFTscreen.text(DisplayValueSWR, 40, 5);
 }
 
+
+double stepsToMh(float x) {
+  return  3.2408606623203362e-001 * pow(x, 0)
+          +  4.8175734249036963e-005 * pow(x, 1)
+          + -8.2394558534492893e-009 * pow(x, 2)
+          +  4.1381892772191581e-012 * pow(x, 3)
+          + -5.0628320718901775e-016 * pow(x, 4)
+          +  3.2564586259750260e-020 * pow(x, 5)
+          + -1.1101886921087241e-024 * pow(x, 6)
+          +  1.3237902692887521e-029 * pow(x, 7)
+          +  3.9488291689952899e-034 * pow(x, 8)
+          + -1.8793946779017113e-038 * pow(x, 9)
+          +  3.2823426065013548e-043 * pow(x, 10)
+          + -2.7820892583909193e-048 * pow(x, 11)
+          +  9.4929814793314678e-054 * pow(x, 12);
+}
+
 void displayLSteps() {                                         // display L steps values
   dtostrf(valueRotateL, 5, 0, DisplayValueL);
   if (isBusy) {
@@ -326,17 +343,17 @@ void EraseDisplayL() {                                        // erase L steps a
   ErasDisplayValueLuH();
 }
 
- double stepsC1topF(double x) {
-   return  3.5215908593183684e+002 * pow(x,0)
-        + -1.6245967367326516e-001 * pow(x,1)
-        + -8.9757122524750620e-004 * pow(x,2)
-        +  5.3372752892602197e-006 * pow(x,3)
-        + -1.7696527557016530e-008 * pow(x,4)
-        +  3.3363571963309934e-011 * pow(x,5)
-        + -3.6438105893235793e-014 * pow(x,6)
-        +  2.2733846666230038e-017 * pow(x,7)
-        + -7.5016703085658784e-021 * pow(x,8)
-        +  1.0154127876671653e-024 * pow(x,9);
+double stepsC1topF(double x) {
+  return  3.5215908593183684e+002 * pow(x, 0)
+          + -1.6245967367326516e-001 * pow(x, 1)
+          + -8.9757122524750620e-004 * pow(x, 2)
+          +  5.3372752892602197e-006 * pow(x, 3)
+          + -1.7696527557016530e-008 * pow(x, 4)
+          +  3.3363571963309934e-011 * pow(x, 5)
+          + -3.6438105893235793e-014 * pow(x, 6)
+          +  2.2733846666230038e-017 * pow(x, 7)
+          + -7.5016703085658784e-021 * pow(x, 8)
+          +  1.0154127876671653e-024 * pow(x, 9);
 }
 
 void displayC1steps() {                                       // display C1 steps values
@@ -383,17 +400,17 @@ void EraseDisplayC1() {                                        // erase C1 value
   ErasDisplayValueC1pF();
 }
 
- double stepsC2topF(double x) {
-   return  3.5215908593183684e+002 * pow(x,0)
-        + -1.6245967367326516e-001 * pow(x,1)
-        + -8.9757122524750620e-004 * pow(x,2)
-        +  5.3372752892602197e-006 * pow(x,3)
-        + -1.7696527557016530e-008 * pow(x,4)
-        +  3.3363571963309934e-011 * pow(x,5)
-        + -3.6438105893235793e-014 * pow(x,6)
-        +  2.2733846666230038e-017 * pow(x,7)
-        + -7.5016703085658784e-021 * pow(x,8)
-        +  1.0154127876671653e-024 * pow(x,9);
+double stepsC2topF(double x) {
+  return  3.5215908593183684e+002 * pow(x, 0)
+          + -1.6245967367326516e-001 * pow(x, 1)
+          + -8.9757122524750620e-004 * pow(x, 2)
+          +  5.3372752892602197e-006 * pow(x, 3)
+          + -1.7696527557016530e-008 * pow(x, 4)
+          +  3.3363571963309934e-011 * pow(x, 5)
+          + -3.6438105893235793e-014 * pow(x, 6)
+          +  2.2733846666230038e-017 * pow(x, 7)
+          + -7.5016703085658784e-021 * pow(x, 8)
+          +  1.0154127876671653e-024 * pow(x, 9);
 }
 
 void displayC2steps() {                                       // display C2 steps values
@@ -457,24 +474,6 @@ void EraseDisplayC2() {                                        // erase C1 value
 //  TFTscreen.setTextSize(2);
 //  TFTscreen.text(DisplayValueC2, 40, 85);
 //}
-
-double stepsToMh(float x) {
-  return  3.2408606623203362e-001 * pow(x, 0)
-          +  4.8175734249036963e-005 * pow(x, 1)
-          + -8.2394558534492893e-009 * pow(x, 2)
-          +  4.1381892772191581e-012 * pow(x, 3)
-          + -5.0628320718901775e-016 * pow(x, 4)
-          +  3.2564586259750260e-020 * pow(x, 5)
-          + -1.1101886921087241e-024 * pow(x, 6)
-          +  1.3237902692887521e-029 * pow(x, 7)
-          +  3.9488291689952899e-034 * pow(x, 8)
-          + -1.8793946779017113e-038 * pow(x, 9)
-          +  3.2823426065013548e-043 * pow(x, 10)
-          + -2.7820892583909193e-048 * pow(x, 11)
-          +  9.4929814793314678e-054 * pow(x, 12);
-}
-
-
 
 //void eraseFrequency() {                         // when * pressed - erases entered frequency bottom of the screen
 //  EnteredFreqString = "";
@@ -589,9 +588,9 @@ void keypadEvent(KeypadEvent eKey) {
         case 'U':                           // "L" motor move 100 step CW
           incL(+10.0);
           break;
-///        case '*':                           // erase entered frequency
-//          eraseFrequency();
-//          break;
+        ///        case '*':                           // erase entered frequency
+        //          eraseFrequency();
+        //          break;
         case 'S':                           // erase entered frequency
           mechAutoTune();
           break;
