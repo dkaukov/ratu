@@ -57,7 +57,7 @@ char DisplayValueC1pF[6];
 char DisplayValueC2[6];
 char DisplayValueC2pF[6];
 char DisplayValueL[6];
-char DisplayValueLUH[4];
+char DisplayValueL1uH[6];
 char DisplayValueSWR[6];
 char input; //buffer for input characters for calculations
 
@@ -196,7 +196,7 @@ void EraseDisplaySWR() {                                   // erase display SWR 
 }
 
 
-double stepsToMh(float x) {
+double stepsToUH(float x) {
   return  3.2408606623203362e-001 * pow(x, 0)
           +  4.8175734249036963e-005 * pow(x, 1)
           + -8.2394558534492893e-009 * pow(x, 2)
@@ -213,7 +213,7 @@ double stepsToMh(float x) {
 }
 
 void displayLSteps() {                                         // display L steps values
-  dtostrf(valueRotateL, 5, 0, DisplayValueL);
+  dtostrf(valueRotateL, 6, 0, DisplayValueL);
   if (isBusy) {
     TFTscreen.stroke(255, 255, 0);
   } else {
@@ -230,20 +230,20 @@ void EraseDisplayLSteps() {                                   // erase display L
 }
 
 void displayValueLuH() {                                         // display L values in uH
-  dtostrf(stepsToMh(valueRotateL), 4, 2, DisplayValueLUH);
+  dtostrf(stepsToUH(valueRotateL), 4, 2, DisplayValueL1uH);
   if (isBusy) {
     TFTscreen.stroke(255, 255, 0);
   } else {
     TFTscreen.stroke(0, 255, 0);
   }
   TFTscreen.setTextSize(2);
-  TFTscreen.text(DisplayValueLUH, 40, 25);
+  TFTscreen.text(DisplayValueL1uH, 40, 25);
 }
 
 void ErasDisplayValueLuH() {                                   // erase display L values in uH
   TFTscreen.stroke(0, 20, 30);
   TFTscreen.setTextSize(2);
-  TFTscreen.text(DisplayValueLUH, 40, 25);
+  TFTscreen.text(DisplayValueL1uH, 40, 25);
 }
 
 void displayL() {                                             // display L steps and uH
