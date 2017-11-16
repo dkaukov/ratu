@@ -149,17 +149,30 @@ void displayInitialScreen() {                      // displays "Wait Calibrating
   TFTscreen.setTextSize(2);                         // set the font size 2
   TFTscreen.text("SWR", 5, 5);                     // write the text to coordinates
   // Displays L
-  TFTscreen.stroke(0, 255, 0);                      // set the font color
-  TFTscreen.setTextSize(2);                         // set the font size 2
-  TFTscreen.text("L", 5, 25);                     // write the text to coordinates
+  TFTscreen.stroke(0, 255, 0); 
+  TFTscreen.setTextSize(2);  
+  TFTscreen.text("L", 5, 25);
+  // Displays uH
+  TFTscreen.stroke(0, 255, 0);
+  TFTscreen.setTextSize(2);
+  TFTscreen.text("uH", 105, 25);
   // Displays C1
-  TFTscreen.stroke(0, 255, 0);                      // set the font color
-  TFTscreen.setTextSize(2);                         // set the font size 2
-  TFTscreen.text("C1", 5, 55);                     // write the text to coordinates
+  TFTscreen.stroke(0, 255, 0);
+  TFTscreen.setTextSize(2);
+  TFTscreen.text("C1", 5, 55);
+  // Displays pF for C1
+  TFTscreen.stroke(0, 255, 0);
+  TFTscreen.setTextSize(2);
+  TFTscreen.text("pF", 105, 55);
   // Displays C2
-  TFTscreen.stroke(0, 255, 0);                      // set the font color
-  TFTscreen.setTextSize(2);                         // set the font size 2
-  TFTscreen.text("C2", 5, 85);                     // write the text to coordinates
+  TFTscreen.stroke(0, 255, 0);
+  TFTscreen.setTextSize(2);
+  TFTscreen.text("C2", 5, 85);
+  // Displays pF for C2
+  TFTscreen.stroke(0, 255, 0);
+  TFTscreen.setTextSize(2);
+  TFTscreen.text("pF", 105, 85);
+  
 
   keypad.addEventListener(keypadEvent);             //add an event listener for this keypad
 }
