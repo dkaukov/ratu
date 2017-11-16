@@ -193,12 +193,12 @@ void displayInitialScreen() {                      // displays "Wait Calibrating
 //}
 
 // Pre-STAGE 1 (coarse tuning process) cleanups and displays - will be used later
-void SetFrequency() {                               // when # pressed - sets frequency value at the bottom of the screen
-  eraseFreqTopScreen();                             // clear previously entered drequesncy at display top
-  eraseEnteredFrequency();                          // clear entered frequency at display bottom
-  displayFreqTopScreen();                           // display desired frequesncy at display top
+//void SetFrequency() {                               // when # pressed - sets frequency value at the bottom of the screen
+//  eraseFreqTopScreen();                             // clear previously entered drequesncy at display top
+//  eraseEnteredFrequency();                          // clear entered frequency at display bottom
+//  displayFreqTopScreen();                           // display desired frequesncy at display top
   //  SetFrequencyStage1();
-}
+//}
 
 
 void incL(float diff) {                             // rotate motor L with number of steps
@@ -234,33 +234,33 @@ void incC2(float diff) {                            // rotate motor C2 Hot with 
 //    }
 //}
 
-void eraseFreqTopScreen() {                      // erases frequency value from top of display
-  TFTscreen.stroke(0, 20, 30);
-  TFTscreen.setTextSize(2);
-  TFTscreen.text(tuningFreq, 50, 110);
-  TuningFreqString = "";
-}
+//void eraseFreqTopScreen() {                      // erases frequency value from top of display
+//  TFTscreen.stroke(0, 20, 30);
+//  TFTscreen.setTextSize(2);
+//  TFTscreen.text(tuningFreq, 50, 110);
+//  TuningFreqString = "";
+//}
 
-void displayFreqTopScreen() {                   // shows frequency value at top of display font 4
-  TuningFreqString = EnteredFreqString;
-  TuningFreqString.toCharArray(tuningFreq, 6);
-  EnteredFreqString = "";
-  TFTscreen.stroke(255, 255, 0);
-  TFTscreen.setTextSize(2);
-  TFTscreen.text(tuningFreq, 50, 110);
-}
+//void displayFreqTopScreen() {                   // shows frequency value at top of display font 4
+//  TuningFreqString = EnteredFreqString;
+//  TuningFreqString.toCharArray(tuningFreq, 6);
+//  EnteredFreqString = "";
+//  TFTscreen.stroke(255, 255, 0);
+//  TFTscreen.setTextSize(2);
+//  TFTscreen.text(tuningFreq, 50, 110);
+//}
 
-void displayTunedFreqTopScreen() {             // Display tuningFreq at the top of the screen in "green tuned mode"
-  TFTscreen.stroke(0, 255, 0);
-  TFTscreen.setTextSize(2);
-  TFTscreen.text(tuningFreq, 50, 110);
-}
+//void displayTunedFreqTopScreen() {             // Display tuningFreq at the top of the screen in "green tuned mode"
+//  TFTscreen.stroke(0, 255, 0);
+//  TFTscreen.setTextSize(2);
+//  TFTscreen.text(tuningFreq, 50, 110);
+//}
 
-void eraseEnteredFrequency () {               // erase frequency value at the botton of the screen
-  TFTscreen.setTextSize(2);
-  TFTscreen.stroke(0, 20, 30);
-  TFTscreen.text(enteredFreq, 50, 110);
-}
+//void eraseEnteredFrequency () {               // erase frequency value at the botton of the screen
+//  TFTscreen.setTextSize(2);
+//  TFTscreen.stroke(0, 20, 30);
+//  TFTscreen.text(enteredFreq, 50, 110);
+//}
 
 void displaySWRvalue() {                                    // process to display SWR values
   EraseDisplaySWR();
@@ -287,31 +287,25 @@ void displayLSteps() {                                         // display L step
   } else {
     TFTscreen.stroke(0, 255, 0);
   }
-  TFTscreen.setTextSize(2);
-  TFTscreen.text(DisplayValueL, 40, 40);
-}
-
-void displayValueLuH() {                                         // display L values (in uH)
-  dtostrf(stepsToMh(valueRotateL), 4, 2, DisplayValueLUH);
-  TFTscreen.stroke(0, 255, 0);
-  TFTscreen.setTextSize(2);
-  TFTscreen.text(DisplayValueLUH, 40, 25);
-}
-
-void displayL() {   
-  displayLSteps();  
-  displayValueLuH();                                    
-}
-
-void EraseDisplayL() {   
-  EraseDisplayLSteps();  
-  ErasDisplayValueLuH();                                    
+  TFTscreen.setTextSize(1);
+  TFTscreen.text(DisplayValueL, 55, 42);
 }
 
 void EraseDisplayLSteps() {                                   // erase display L steps values
   TFTscreen.stroke(0, 20, 30);
+  TFTscreen.setTextSize(1);
+  TFTscreen.text(DisplayValueL, 55, 42);
+}
+
+void displayValueLuH() {                                         // display L values in uH
+  dtostrf(stepsToMh(valueRotateL), 4, 2, DisplayValueLUH);
+  if (isBusy) {
+    TFTscreen.stroke(255, 255, 0);
+  } else {  
+    TFTscreen.stroke(0, 255, 0);
+  }
   TFTscreen.setTextSize(2);
-  TFTscreen.text(DisplayValueL, 40, 40);
+  TFTscreen.text(DisplayValueLUH, 40, 25);
 }
 
 void ErasDisplayValueLuH() {                                   // erase display L values in uH
@@ -319,6 +313,17 @@ void ErasDisplayValueLuH() {                                   // erase display 
   TFTscreen.setTextSize(2);
   TFTscreen.text(DisplayValueLUH, 40, 25);
 }
+
+void displayL() {                                             // display L steps and uH 
+  displayLSteps();  
+  displayValueLuH();                                    
+}
+
+void EraseDisplayL() {                                        // erase L steps and uH
+  EraseDisplayLSteps();  
+  ErasDisplayValueLuH();                                    
+}
+
 
 void displayC1() {                                       // display C values
   dtostrf(valueRotateC1, 5, 0, DisplayValueC1);
@@ -464,9 +469,9 @@ void keypadEvent(KeypadEvent eKey) {
     case PRESSED:
       //    lcd.print(eKey);
       switch (eKey) {
-        case '#':                           // submit frequesncy
-          SetFrequency();
-          break;
+//        case '#':                           // submit frequesncy
+//          SetFrequency();
+//         break;
         case 'c':                           // "C1 Cold" motor move 5 step CCW
           incC1(-1);
           break;
