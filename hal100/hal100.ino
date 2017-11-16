@@ -55,9 +55,9 @@ char enteredFreq[6];
 char tuningFreq[6];
 char key;
 char DisplayValueC1[6];
-char DisplayValueC1pH[6];
+char DisplayValueC1pF[6];
 char DisplayValueC2[6];
-char DisplayValueC2pH[6];
+char DisplayValueC2pF[6];
 char DisplayValueL[6];
 char DisplayValueLUH[4];
 char DisplayValueSWR[6];
@@ -326,7 +326,7 @@ void EraseDisplayL() {                                        // erase L steps a
   ErasDisplayValueLuH();
 }
 
- double stepsC1topH(double x) {
+ double stepsC1topF(double x) {
    return  3.5215908593183684e+002 * pow(x,0)
         + -1.6245967367326516e-001 * pow(x,1)
         + -8.9757122524750620e-004 * pow(x,2)
@@ -347,59 +347,116 @@ void displayC1steps() {                                       // display C1 step
     TFTscreen.stroke(0, 255, 0);
   }
   TFTscreen.setTextSize(1);
-  TFTscreen.text(DisplayValueC1, 55, 70);
+  TFTscreen.text(DisplayValueC1, 55, 72);
 }
 
 void EraseDisplayC1steps() {                                   // erase display C1 steps values
   TFTscreen.stroke(0, 20, 20);
   TFTscreen.setTextSize(1);
-  TFTscreen.text(DisplayValueC1, 55, 70);
+  TFTscreen.text(DisplayValueC1, 55, 72);
 }
 
-void displayValueC1pH() {                                         // display C1 values in pH
-  dtostrf(stepsC1topH(valueRotateC1), 4, 1, DisplayValueC1pH);
+void displayValueC1pF() {                                         // display C1 values in pF
+  dtostrf(stepsC1topF(valueRotateC1), 4, 1, DisplayValueC1pF);
   if (isBusy) {
     TFTscreen.stroke(255, 255, 0);
   } else {
     TFTscreen.stroke(0, 255, 0);
   }
   TFTscreen.setTextSize(2);
-  TFTscreen.text(DisplayValueC1pH, 40, 55);
+  TFTscreen.text(DisplayValueC1pF, 40, 55);
 }
 
-void ErasDisplayValueC1pH() {                                   // erase display C1 values in pH
+void ErasDisplayValueC1pF() {                                   // erase display C1 values in pF
   TFTscreen.stroke(0, 20, 30);
   TFTscreen.setTextSize(2);
-  TFTscreen.text(DisplayValueC1pH, 40, 55);
+  TFTscreen.text(DisplayValueC1pF, 40, 55);
 }
 
 void displayC1() {                                             // display C1 values
   displayC1steps();
-  displayValueC1pH();
+  displayValueC1pF();
 }
 
 void EraseDisplayC1() {                                        // erase C1 values
   EraseDisplayC1steps();
-  ErasDisplayValueC1pH();
+  ErasDisplayValueC1pF();
 }
 
+ double stepsC2topF(double x) {
+   return  3.5215908593183684e+002 * pow(x,0)
+        + -1.6245967367326516e-001 * pow(x,1)
+        + -8.9757122524750620e-004 * pow(x,2)
+        +  5.3372752892602197e-006 * pow(x,3)
+        + -1.7696527557016530e-008 * pow(x,4)
+        +  3.3363571963309934e-011 * pow(x,5)
+        + -3.6438105893235793e-014 * pow(x,6)
+        +  2.2733846666230038e-017 * pow(x,7)
+        + -7.5016703085658784e-021 * pow(x,8)
+        +  1.0154127876671653e-024 * pow(x,9);
+}
 
-void displayC2() {                                       // display C2 steps values
+void displayC2steps() {                                       // display C2 steps values
   dtostrf(valueRotateC2, 5, 0, DisplayValueC2);
   if (isBusy) {
     TFTscreen.stroke(255, 255, 0);
   } else {
     TFTscreen.stroke(0, 255, 0);
   }
-  TFTscreen.setTextSize(2);
-  TFTscreen.text(DisplayValueC2, 40, 85);
+  TFTscreen.setTextSize(1);
+  TFTscreen.text(DisplayValueC2, 55, 102);
 }
 
-void EraseDisplayC2() {                                   // erase display C2 steps values
+void EraseDisplayC2steps() {                                   // erase display C2 steps values
   TFTscreen.stroke(0, 20, 20);
-  TFTscreen.setTextSize(2);
-  TFTscreen.text(DisplayValueC2, 40, 85);
+  TFTscreen.setTextSize(1);
+  TFTscreen.text(DisplayValueC2, 55, 102);
 }
+
+void displayValueC2pF() {                                         // display C2 values in pF
+  dtostrf(stepsC2topF(valueRotateC2), 4, 1, DisplayValueC2pF);
+  if (isBusy) {
+    TFTscreen.stroke(255, 255, 0);
+  } else {
+    TFTscreen.stroke(0, 255, 0);
+  }
+  TFTscreen.setTextSize(2);
+  TFTscreen.text(DisplayValueC2pF, 40, 85);
+}
+
+void ErasDisplayValueC2pF() {                                   // erase display C1 values in pF
+  TFTscreen.stroke(0, 20, 30);
+  TFTscreen.setTextSize(2);
+  TFTscreen.text(DisplayValueC2pF, 40, 85);
+}
+
+void displayC2() {                                             // display C1 values
+  displayC2steps();
+  displayValueC2pF();
+}
+
+void EraseDisplayC2() {                                        // erase C1 values
+  EraseDisplayC2steps();
+  ErasDisplayValueC2pF();
+}
+
+
+//void displayC2() {                                       // display C2 steps values
+//  dtostrf(valueRotateC2, 5, 0, DisplayValueC2);
+//  if (isBusy) {
+//    TFTscreen.stroke(255, 255, 0);
+//  } else {
+//    TFTscreen.stroke(0, 255, 0);
+//  }
+//  TFTscreen.setTextSize(2);
+//  TFTscreen.text(DisplayValueC2, 40, 85);
+//}
+
+//void EraseDisplayC2() {                                   // erase display C2 steps values
+//  TFTscreen.stroke(0, 20, 20);
+//  TFTscreen.setTextSize(2);
+//  TFTscreen.text(DisplayValueC2, 40, 85);
+//}
 
 double stepsToMh(float x) {
   return  3.2408606623203362e-001 * pow(x, 0)
