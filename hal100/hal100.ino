@@ -57,6 +57,7 @@ char key;
 char DisplayValueC1[6];
 char DisplayValueC2[6];
 char DisplayValueL[6];
+char DisplayValueLUH[4];
 char DisplayValueSWR[6];
 char input; //buffer for input characters for calculations
 // char dataPrintout[10];
@@ -77,6 +78,7 @@ float valueRotateC1 = -1;
 float valueRotateC2 = -1;
 float valueRotateL = -1;
 float valueSWR;
+float stepsToMhFloat;
 
 boolean presentValue = false;
 
@@ -159,19 +161,19 @@ void displayInitialScreen() {                      // displays "Wait Calibrating
   // Displays SWR
   TFTscreen.stroke(0, 255, 0);                      // set the font color
   TFTscreen.setTextSize(2);                         // set the font size 2
-  TFTscreen.text("SWR", 5, 10);                     // write the text to coordinates
+  TFTscreen.text("SWR", 5, 5);                     // write the text to coordinates
   // Displays L
   TFTscreen.stroke(0, 255, 0);                      // set the font color
   TFTscreen.setTextSize(2);                         // set the font size 2
-  TFTscreen.text("L", 5, 40);                     // write the text to coordinates
+  TFTscreen.text("L", 5, 25);                     // write the text to coordinates
   // Displays C1
   TFTscreen.stroke(0, 255, 0);                      // set the font color
   TFTscreen.setTextSize(2);                         // set the font size 2
-  TFTscreen.text("C1", 5, 60);                     // write the text to coordinates
+  TFTscreen.text("C1", 5, 65);                     // write the text to coordinates
   // Displays C2
   TFTscreen.stroke(0, 255, 0);                      // set the font color
   TFTscreen.setTextSize(2);                         // set the font size 2
-  TFTscreen.text("C2", 5, 80);                     // write the text to coordinates
+  TFTscreen.text("C2", 5, 85);                     // write the text to coordinates
 
   keypad.addEventListener(keypadEvent);             //add an event listener for this keypad
 }
@@ -269,16 +271,16 @@ void displaySWR() {                                         // display SWR value
   dtostrf(valueSWR, 5, 2, DisplayValueSWR);
   TFTscreen.stroke(0, 255, 0);
   TFTscreen.setTextSize(2);
-  TFTscreen.text(DisplayValueSWR, 40, 10);
+  TFTscreen.text(DisplayValueSWR, 40, 5);
 }
 
 void EraseDisplaySWR() {                                   // erase display SWR values
   TFTscreen.stroke(0, 20, 30);
   TFTscreen.setTextSize(2);
-  TFTscreen.text(DisplayValueSWR, 40, 10);
+  TFTscreen.text(DisplayValueSWR, 40, 5);
 }
 
-void displayL() {                                         // display L values
+void displayLSteps() {                                         // display L values
   dtostrf(valueRotateL, 5, 0, DisplayValueL);
   if (isBusy) {
     TFTscreen.stroke(255, 255, 0);
@@ -289,10 +291,24 @@ void displayL() {                                         // display L values
   TFTscreen.text(DisplayValueL, 40, 40);
 }
 
+void displayValueLuH() {                                         // display L values (in Mh)
+  dtostrf(stepsToMh(valueRotateL), 4, 2, DisplayValueLUH);
+  TFTscreen.stroke(0, 255, 0);
+  TFTscreen.setTextSize(2);
+  TFTscreen.text(DisplayValueLUH, 40, 25);
+}
+
+void displayL() {   
+//  displayLSteps();  
+  displayValueLuH();                                    
+}
+
+
 void EraseDisplayL() {                                   // erase display L values
   TFTscreen.stroke(0, 20, 30);
   TFTscreen.setTextSize(2);
   TFTscreen.text(DisplayValueL, 40, 40);
+  TFTscreen.text(DisplayValueLUH, 40, 25);
 }
 
 void displayC1() {                                       // display C values
@@ -303,13 +319,13 @@ void displayC1() {                                       // display C values
     TFTscreen.stroke(0, 255, 0);
   }
   TFTscreen.setTextSize(2);
-  TFTscreen.text(DisplayValueC1, 40, 60);
+  TFTscreen.text(DisplayValueC1, 40, 65);
 }
 
 void EraseDisplayC1() {                                   // erase display C values
   TFTscreen.stroke(0, 20, 20);
   TFTscreen.setTextSize(2);
-  TFTscreen.text(DisplayValueC1, 40, 60);
+  TFTscreen.text(DisplayValueC1, 40, 65);
 }
 
 void displayC2() {                                       // display C values
@@ -320,17 +336,16 @@ void displayC2() {                                       // display C values
     TFTscreen.stroke(0, 255, 0);
   }
   TFTscreen.setTextSize(2);
-  TFTscreen.text(DisplayValueC2, 40, 80);
+  TFTscreen.text(DisplayValueC2, 40, 85);
 }
 
 void EraseDisplayC2() {                                   // erase display C values
   TFTscreen.stroke(0, 20, 20);
   TFTscreen.setTextSize(2);
-  TFTscreen.text(DisplayValueC2, 40, 80);
+  TFTscreen.text(DisplayValueC2, 40, 85);
 }
 
-void displayLuH() {
-  double stepsToMh(float x) {
+double stepsToMh(float x) {
     return  3.2408606623203362e-001 * pow(x, 0)
             +  4.8175734249036963e-005 * pow(x, 1)
             + -8.2394558534492893e-009 * pow(x, 2)
@@ -345,7 +360,8 @@ void displayLuH() {
             + -2.7820892583909193e-048 * pow(x, 11)
             +  9.4929814793314678e-054 * pow(x, 12);
   }
-}
+  
+
 
 void eraseFrequency() {                         // when * pressed - erases entered frequency bottom of the screen
   EnteredFreqString = "";
@@ -523,8 +539,8 @@ void loop() {
       TFTscreen.stroke(0, 20, 20);
       digitalWrite(40, HIGH);
     }
-    TFTscreen.setTextSize(2);
-    TFTscreen.text("Ready", 30, 105);                // write the text to coordinates
+    TFTscreen.setTextSize(1);
+    TFTscreen.text("Ready", 50, 115);                // write the text to coordinates
 
     displayRefresh = false;
   }
