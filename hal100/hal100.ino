@@ -148,8 +148,10 @@ void setup() {
   Serial.begin(115200);
   Serial2.begin(TS_PORT_BITRATE);
   pinMode(40, OUTPUT);
-  tft.begin();                                // initialise TFT screen
   busInit(busReceiver, 2, &Serial2);
+  tft.init();
+  tft.setRotation(1);
+  tft.fillScreen(TFT_BLACK);
   displayInitialScreen();
 
 }
