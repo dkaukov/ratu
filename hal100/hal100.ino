@@ -25,10 +25,10 @@
 
 */
 #include "proto/device_id.h"
-#include <TFT.h>    // Arduino LCD library
-#include <SPI.h>    // SPI library
-#include <Keypad.h> // Keypad library
-#include <math.h>   // Math library
+#include <SPI.h>          // SPI library
+#include <TFT_ST7735.h>   // Graphics and font library for ST7735 driver chip
+#include <Keypad.h>       // Keypad library
+#include <math.h>         // Math library
 #define PJON_ID ID_HAL100
 #include "proto/common.h"
 
@@ -44,7 +44,7 @@ const unsigned char bell [] PROGMEM = {
 #define rst  8
 
 // create an instance of the TFT library
-TFT TFTscreen = TFT(cs, dc, rst);
+TFT_ST7735 tft = TFT_ST7735();
 
 #define DISPLAY_REFRESH_L   0x01
 #define DISPLAY_REFRESH_C1  0x02
@@ -74,11 +74,6 @@ float valueSWR;
 float stepsToMhFloat;
 
 boolean presentValue = false;
-
-String DisplayValueLstring;
-
-int i;
-
 
 // --- Keypad code start ---
 const byte ROWS = 5; // Five rows
@@ -148,43 +143,43 @@ void setup() {
   Serial.begin(115200);
   Serial2.begin(TS_PORT_BITRATE);
   pinMode(40, OUTPUT);
-  TFTscreen.begin();                                // initialise TFT screen
-  TFTscreen.background(0, 20, 30);                  // clear the screen with a RGB background
-
+  tft.init();
+  tft.setRotation(1);                               // initialise TFT screen
   busInit(busReceiver, 2, &Serial2);
+  tft.fillScreen(TFT_BLACK);
   displayInitialScreen();
 
 }
 
 void displayInitialScreen() {                      // displays "Wait Calibrating at start. To be linked to Motors "L" and "C" calibration process
   // Displays SWR
-  TFTscreen.stroke(0, 255, 0);                      // set the font color
-  TFTscreen.setTextSize(2);                         // set the font size 2
-  TFTscreen.text("SWR", 5, 5);                     // write the text to coordinates
+  tft.setTextColor(TFT_GREEN);
+  tft.setTextSize(1);                         // set the font size 2
+  tft.drawString("SWR", 10, 10, 2);             // write the text to coordinates
   // Displays L
-  TFTscreen.stroke(0, 255, 0); 
-  TFTscreen.setTextSize(2);  
-  TFTscreen.text("L", 5, 25);
+  tft.setTextColor(TFT_GREEN);
+  tft.setTextSize(1);
+  tft.drawString("L", 7, 37, 2);
   // Displays uH
-  TFTscreen.stroke(0, 255, 0);
-  TFTscreen.setTextSize(2);
-  TFTscreen.text("uH", 105, 25);
+  tft.setTextColor(TFT_GREEN);
+  tft.setTextSize(1);
+  tft.drawString("uH", 117, 49, 2);
   // Displays C1
-  TFTscreen.stroke(0, 255, 0);
-  TFTscreen.setTextSize(2);
-  TFTscreen.text("C1", 5, 55);
+  tft.setTextColor(TFT_GREEN);
+  tft.setTextSize(1);
+  tft.drawString("C1", 7, 70, 2);
   // Displays pF for C1
-  TFTscreen.stroke(0, 255, 0);
-  TFTscreen.setTextSize(2);
-  TFTscreen.text("pF", 105, 55);
+  tft.setTextColor(TFT_GREEN);
+  tft.setTextSize(1);
+  tft.drawString("pF", 117, 81, 2);
   // Displays C2
-  TFTscreen.stroke(0, 255, 0);
-  TFTscreen.setTextSize(2);
-  TFTscreen.text("C2", 5, 85);
+  tft.setTextColor(TFT_GREEN);
+  tft.setTextSize(1);
+  tft.drawString("C2", 7, 101, 2);
   // Displays pF for C2
-  TFTscreen.stroke(0, 255, 0);
-  TFTscreen.setTextSize(2);
-  TFTscreen.text("pF", 105, 85);
+  tft.setTextColor(TFT_GREEN);
+  tft.setTextSize(1);
+  tft.drawString("pF", 117, 112, 2);
   
 
   keypad.addEventListener(keypadEvent);             //add an event listener for this keypad
@@ -210,15 +205,15 @@ void displaySWRvalue() {                                    // process to displa
 
 void displaySWR() {                                         // display SWR values
   dtostrf(valueSWR, 5, 2, DisplayValueSWR);
-  TFTscreen.stroke(0, 255, 0);
-  TFTscreen.setTextSize(2);
-  TFTscreen.text(DisplayValueSWR, 40, 5);
+  tft.setTextColor(TFT_GREEN);
+  tft.setTextSize(1);
+  tft.drawString(DisplayValueSWR, 50, 5, 4);
 }
 
 void EraseDisplaySWR() {                                   // erase display SWR values
-  TFTscreen.stroke(0, 20, 30);
-  TFTscreen.setTextSize(2);
-  TFTscreen.text(DisplayValueSWR, 40, 5);
+  tft.setTextColor(TFT_BLACK);
+  tft.setTextSize(2);
+  tft.drawString(DisplayValueSWR, 40, 5, 1);
 }
 
 double stepsToUH(double x) {
@@ -233,38 +228,39 @@ double stepsToUH(double x) {
         +  7.0123651511795207e-039 * pow(x,8);
 }
 
-void displayLSteps() {                                         // display L steps values
-  dtostrf(valueRotateL, 6, 0, DisplayValueL);
-  if (isBusy) {
-    TFTscreen.stroke(255, 255, 0);
-  } else {
-    TFTscreen.stroke(0, 255, 0);
-  }
-  TFTscreen.setTextSize(1);
-  TFTscreen.text(DisplayValueL, 55, 42);
-}
-
-void EraseDisplayLSteps() {                                   // erase display L steps values
-  TFTscreen.stroke(0, 20, 30);
-  TFTscreen.setTextSize(1);
-  TFTscreen.text(DisplayValueL, 55, 42);
-}
-
 void displayValueLuH() {                                         // display L values in uH
-  dtostrf(stepsToUH(valueRotateL), 4, 2, DisplayValueL1uH);
+  dtostrf(stepsToUH(valueRotateL), 4, 3, DisplayValueL1uH);
   if (isBusy) {
-    TFTscreen.stroke(255, 255, 0);
+    tft.setTextColor(TFT_YELLOW);
   } else {
-    TFTscreen.stroke(0, 255, 0);
+    tft.setTextColor(TFT_GREEN);
   }
-  TFTscreen.setTextSize(2);
-  TFTscreen.text(DisplayValueL1uH, 40, 25);
+  tft.setTextSize(1);
+  tft.drawString(DisplayValueL1uH, 50, 42, 4);
 }
 
 void ErasDisplayValueLuH() {                                   // erase display L values in uH
-  TFTscreen.stroke(0, 20, 30);
-  TFTscreen.setTextSize(2);
-  TFTscreen.text(DisplayValueL1uH, 40, 25);
+  tft.setTextColor(TFT_BLACK);
+  tft.setTextSize(1);
+  tft.drawString(DisplayValueL1uH, 50, 42, 4);
+}
+
+void displayLSteps() {                                         // display L steps values
+  dtostrf(valueRotateL, 6, 0, DisplayValueL);
+  if (isBusy) {
+    tft.setTextColor(TFT_YELLOW);
+
+  } else {
+    tft.setTextColor(TFT_GREEN);
+  }
+  tft.setTextSize(1);
+  tft.drawString(DisplayValueL, 0, 51, 2);
+}
+
+void EraseDisplayLSteps() {                                   // erase display L steps values
+  tft.setTextColor(TFT_BLACK);
+  tft.setTextSize(1);
+  tft.drawString(DisplayValueL, 0, 51, 2);
 }
 
 void displayL() {                                             // display L steps and uH
@@ -290,38 +286,38 @@ double stepsC1topF(double x) {
           +  1.0154127876671653e-024 * pow(x, 9);
 }
 
-void displayC1steps() {                                       // display C1 steps values
-  dtostrf(valueRotateC1, 5, 0, DisplayValueC1);
-  if (isBusy) {
-    TFTscreen.stroke(255, 255, 0);
-  } else {
-    TFTscreen.stroke(0, 255, 0);
-  }
-  TFTscreen.setTextSize(1);
-  TFTscreen.text(DisplayValueC1, 55, 72);
-}
-
-void EraseDisplayC1steps() {                                   // erase display C1 steps values
-  TFTscreen.stroke(0, 20, 20);
-  TFTscreen.setTextSize(1);
-  TFTscreen.text(DisplayValueC1, 55, 72);
-}
-
 void displayValueC1pF() {                                         // display C1 values in pF
   dtostrf(stepsC1topF(valueRotateC1), 4, 1, DisplayValueC1pF);
   if (isBusy) {
-    TFTscreen.stroke(255, 255, 0);
+    tft.setTextColor(TFT_YELLOW);
   } else {
-    TFTscreen.stroke(0, 255, 0);
+    tft.setTextColor(TFT_GREEN);
   }
-  TFTscreen.setTextSize(2);
-  TFTscreen.text(DisplayValueC1pF, 40, 55);
+  tft.setTextSize(1);
+  tft.drawString(DisplayValueC1pF, 50, 75, 4);
 }
 
 void ErasDisplayValueC1pF() {                                   // erase display C1 values in pF
-  TFTscreen.stroke(0, 20, 30);
-  TFTscreen.setTextSize(2);
-  TFTscreen.text(DisplayValueC1pF, 40, 55);
+  tft.setTextColor(TFT_BLACK);
+  tft.setTextSize(1);
+  tft.drawString(DisplayValueC1pF, 50, 75, 4);
+}
+
+void displayC1steps() {                                       // display C1 steps values
+  dtostrf(valueRotateC1, 5, 0, DisplayValueC1);
+  if (isBusy) {
+    tft.setTextColor(TFT_YELLOW);
+  } else {
+    tft.setTextColor(TFT_GREEN);
+  }
+  tft.setTextSize(1);
+  tft.drawString(DisplayValueC1, 0, 83, 2);
+}
+
+void EraseDisplayC1steps() {                                   // erase display C1 steps values
+  tft.setTextColor(TFT_BLACK);
+  tft.setTextSize(1);
+  tft.drawString(DisplayValueC1, 0, 83, 2);
 }
 
 void displayC1() {                                             // display C1 values
@@ -347,38 +343,38 @@ double stepsC2topF(double x) {
           +  1.0154127876671653e-024 * pow(x, 9);
 }
 
-void displayC2steps() {                                       // display C2 steps values
-  dtostrf(valueRotateC2, 5, 0, DisplayValueC2);
-  if (isBusy) {
-    TFTscreen.stroke(255, 255, 0);
-  } else {
-    TFTscreen.stroke(0, 255, 0);
-  }
-  TFTscreen.setTextSize(1);
-  TFTscreen.text(DisplayValueC2, 55, 102);
-}
-
-void EraseDisplayC2steps() {                                   // erase display C2 steps values
-  TFTscreen.stroke(0, 20, 20);
-  TFTscreen.setTextSize(1);
-  TFTscreen.text(DisplayValueC2, 55, 102);
-}
-
 void displayValueC2pF() {                                         // display C2 values in pF
   dtostrf(stepsC2topF(valueRotateC2), 4, 1, DisplayValueC2pF);
   if (isBusy) {
-    TFTscreen.stroke(255, 255, 0);
+    tft.setTextColor(TFT_YELLOW);
   } else {
-    TFTscreen.stroke(0, 255, 0);
+    tft.setTextColor(TFT_GREEN);
   }
-  TFTscreen.setTextSize(2);
-  TFTscreen.text(DisplayValueC2pF, 40, 85);
+  tft.setTextSize(1);
+  tft.drawString(DisplayValueC2pF, 50, 107, 4);
 }
 
 void ErasDisplayValueC2pF() {                                   // erase display C1 values in pF
-  TFTscreen.stroke(0, 20, 30);
-  TFTscreen.setTextSize(2);
-  TFTscreen.text(DisplayValueC2pF, 40, 85);
+  tft.setTextColor(TFT_BLACK);
+  tft.setTextSize(1);
+  tft.drawString(DisplayValueC2pF, 50, 107, 4);
+}
+
+void displayC2steps() {                                       // display C2 steps values
+  dtostrf(valueRotateC2, 5, 0, DisplayValueC2);
+  if (isBusy) {
+    tft.setTextColor(TFT_YELLOW);
+  } else {
+    tft.setTextColor(TFT_GREEN);
+  }
+  tft.setTextSize(1);
+  tft.drawString(DisplayValueC2, 0, 115, 2);
+}
+
+void EraseDisplayC2steps() {                                   // erase display C2 steps values
+  tft.setTextColor(TFT_BLACK);
+  tft.setTextSize(1);
+  tft.drawString(DisplayValueC2, 0, 115, 2);
 }
 
 void displayC2() {                                             // display C1 values
@@ -458,9 +454,9 @@ void loop() {
         EnteredFreqString = EnteredFreqString + key;
         int numLength = EnteredFreqString.length();
         EnteredFreqString.toCharArray(enteredFreq, 6);
-        TFTscreen.stroke(0, 255, 0);
+        TFTscreen.setTextColor(TFT_GREEN);
         TFTscreen.setTextSize(2);
-        TFTscreen.text(enteredFreq, 50, 110);
+        TFTscreen.drawString(enteredFreq, 50, 110);
       */
     }
   }
@@ -487,15 +483,15 @@ void loop() {
     }
     if ((displayRefreshFlags & DISPLAY_REFRESH_BSY) != 0) {
       if (!isBusy) {
-        TFTscreen.stroke(255, 255, 0);                  // set the font color
+        tft.setTextColor(TFT_YELLOW);
         digitalWrite(40, LOW);
       } else {
-        TFTscreen.stroke(0, 20, 20);
+        tft.setTextColor(TFT_BLACK);
         digitalWrite(40, HIGH);
       }
-      TFTscreen.setTextSize(1);
-      TFTscreen.text("Ready", 50, 115);                // write the text to coordinates
-      displayRefreshFlags &= ~DISPLAY_REFRESH_BSY;
+//      tft.setTextSize(1);
+//      tft.drawString("Ready", 50, 115, 1);                // write the text to coordinates
+//      displayRefreshFlags &= ~DISPLAY_REFRESH_BSY;
     }
   }
 }
