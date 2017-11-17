@@ -212,8 +212,8 @@ void displaySWR() {                                         // display SWR value
 
 void EraseDisplaySWR() {                                   // erase display SWR values
   tft.setTextColor(TFT_BLACK);
-  tft.setTextSize(2);
-  tft.drawString(DisplayValueSWR, 40, 5, 1);
+  tft.setTextSize(1);
+  tft.drawString(DisplayValueSWR, 50, 5, 4);
 }
 
 double stepsToUH(double x) {
