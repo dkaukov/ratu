@@ -71,7 +71,6 @@ float valueRotateC1 = -1;
 float valueRotateC2 = -1;
 float valueRotateL = -1;
 float valueSWR;
-float stepsToMhFloat;
 
 boolean presentValue = false;
 
@@ -129,8 +128,8 @@ void busReceiver(char cmd, uint8_t length, const TCommand *payload) {
         boolean bsy = payload->status.flags & (1 << 3);
         if (isBusy != bsy) {
           isBusy = bsy;
-          displayRefreshFlags |= DISPLAY_REFRESH_BSY;
-        }
+          displayRefreshFlags |= (DISPLAY_REFRESH_BSY | DISPLAY_REFRESH_C1 | DISPLAY_REFRESH_C2 | DISPLAY_REFRESH_L);
+        }        
         break;
       }
     case cmdDebug: {
@@ -231,13 +230,13 @@ double stepsToUH(double x) {                                    // L convertion 
 
 void displayValueLuH() {                                         // display L values in uH
   dtostrf(stepsToUH(valueRotateL), 4, 3, DisplayValueL1uH);
-  if (isBusy) {
-    tft.setTextColor(TFT_YELLOW);
-  } else {
-    tft.setTextColor(TFT_GREEN);
-  }
   tft.setTextSize(1);
-  tft.drawString(DisplayValueL1uH, 50, 42, 4);
+  tft.drawString(DisplayValueL1uH, 50, 42, 4);  
+  if (isBusy) {
+    tft.setTextColor(TFT_YELLOW, TFT_BLACK);
+  } else {
+    tft.setTextColor(TFT_GREEN, TFT_BLACK);
+  }
 }
 
 void ErasDisplayValueLuH() {                                   // erase display L values in uH
@@ -346,13 +345,15 @@ double stepsC2topF(double x) {                                      // C2 conver
 
 void displayValueC2pF() {                                           // display C2 values in pF
   dtostrf(stepsC2topF(valueRotateC2), 4, 1, DisplayValueC2pF);
+   tft.setTextSize(1);
+   tft.drawString(DisplayValueC2pF, 50, 107, 4);   
+  
   if (isBusy) {
-    tft.setTextColor(TFT_YELLOW);
-  } else {
-    tft.setTextColor(TFT_GREEN);
+     tft.setTextColor(TFT_YELLOW, TFT_BLACK);
+   } else {
+    tft.setTextColor(TFT_GREEN, TFT_BLACK);
   }
-  tft.setTextSize(1);
-  tft.drawString(DisplayValueC2pF, 50, 107, 4);
+
 }
 
 void ErasDisplayValueC2pF() {                                       // erase display C1 values in pF
@@ -484,7 +485,7 @@ void loop() {
     }
     if ((displayRefreshFlags & DISPLAY_REFRESH_BSY) != 0) {
       if (!isBusy) {
-        tft.setTextColor(TFT_YELLOW);
+        tft.setTextColor(TFT_YELLOW, TFT_BLACK);
         digitalWrite(40, LOW);
       } else {
         tft.setTextColor(TFT_BLACK);
