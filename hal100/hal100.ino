@@ -1,6 +1,7 @@
 /*
   TFT Display 128x128 16bit color ST7735 Chipset
-
+  https://www.jaycar.com.au/128x128-lcd-screen-module-for-arduino/p/XC4629
+  
   TFT display pinout left to right pins up
   VCC GND GND NC NC LED CLK SDI RS RST CS
 
@@ -8,29 +9,33 @@
   PIN TFT       PIN Mega
   VCC           5V
   GND           GND
-  LED           3V3                                         LED backlight control
-  CLK           D20 SCK = PIN 52                            Clock signal
-  SDI           D21 MOSI = PIN 51                           Data signal
-  RS            D9 defined in code below  #define dc   9    Command/Data select
-  RST           D8 defined in code below  #define SRT  8    Reset
-  CS            D10 defined in code below #define cs   10   Chip select
+  LED           3V3 LED backlight control
+  CLK           D20 SCK = PIN 52 Clock signal
+  SDI           D21 MOSI = PIN 51 Data signal
+  RS            D9 Command/Data select Pin
+  RST           D8 Reset Pin
+  CS            D10 Chip select Pin
 
-  https://www.jaycar.com.au/128x128-lcd-screen-module-for-arduino/p/XC4629
-  http://www.arduino.cc/en/Tutorial/TFTDisplayText
+  TFT display library: https://github.com/Bodmer/TFT_ST7735
+  TFT display CS, RS and RST pins definition for Mega2560 defined in 
+  C:\Program Files (x86)\Arduino\libraries\TFT_ST7735-master\User_Setup.h (for Win)
+  according to https://github.com/Bodmer/TFT_ST7735/blob/master/User_Setup.h#L25
 
-
+  -------------------------------------------------------------------------------
+    
   Motor 1 = "L" Motor
   Motor 2 = "C1" Motor "Cold"
   Motor 3 = "C2 Motor "Hot"
 
 */
-#include "proto/device_id.h"
-#include <SPI.h>          // SPI library
-#include <TFT_ST7735.h>   // Graphics and font library for ST7735 driver chip
-#include <Keypad.h>       // Keypad library
-#include <math.h>         // Math library
+
+#include "proto/device_id.h"  // Device ID library
+#include <SPI.h>              // SPI library
+#include <TFT_ST7735.h>       // Graphics and font library for ST7735 driver chip
+#include <Keypad.h>           // Keypad library
+// #include <math.h>             // Math library
 #define PJON_ID ID_HAL100
-#include "proto/common.h"
+#include "proto/common.h"     // Neywork protocol library
 
 //Bell icon size: 16W*16H
 const unsigned char bell [] PROGMEM = {
@@ -38,12 +43,7 @@ const unsigned char bell [] PROGMEM = {
   0x3f, 0xfc, 0x3f, 0xfc, 0x3f, 0xfc, 0x7f, 0xfe, 0x7f, 0xfe, 0xc3, 0xc3, 0xc3, 0xc3, 0x3f, 0xfc,
 };
 
-// TFT display CS, RS and RST pins definition for Mega2560
-#define cs   10
-#define dc   9
-#define rst  8
-
-// create an instance of the TFT library
+// instance of the TFT library
 TFT_ST7735 tft = TFT_ST7735();
 
 #define DISPLAY_REFRESH_L   0x01
@@ -56,7 +56,6 @@ uint8_t displayRefreshFlags = 0;
 boolean isBusy = false;
 
 // char array
-
 char key;
 char DisplayValueC1[10];
 char DisplayValueC1pF[10];
@@ -67,6 +66,7 @@ char DisplayValueL1uH[10];
 char DisplayValueSWR[10];
 char input; //buffer for input characters for calculations
 
+// float array
 float valueRotateC1 = -1;
 float valueRotateC2 = -1;
 float valueRotateL = -1;
@@ -75,16 +75,16 @@ float stepsToMhFloat;
 
 boolean presentValue = false;
 
-// --- Keypad code start ---
+// Keypad definition
 const byte ROWS = 5; // Five rows
 const byte COLS = 4; // Four columns
-// Define the Keymap
+// Keymap definition
 char keys[ROWS][COLS] = {
-  // Buttons association 1=1 2=2 3=3 4=4 5=5 6=6 7=7 8=8 9=9 0=0 *=Led OFF #=Led ON
-  // TOP Buttons  C c L l
-  //Buttons in middle H U D S
+// Buttons association 1=1 2=2 3=3 4=4 5=5 6=6 7=7 8=8 9=9 0=0 *=Led OFF #=Led ON
+// TOP Buttons  C c L l
+//Buttons in middle H U D S
 
-  // COL0-pin1, COL1-pin2, COL2-pin3, COL3-pin4
+// COL0-pin1, COL1-pin2, COL2-pin3, COL3-pin4
   {'S', '1', '2', '3'}, // ROW0-pin5
   {'K', '4', '5', '6'}, // ROW1-pin6
   {'U', '7', '8', '9'}, // ROW2-pin7
@@ -102,6 +102,7 @@ byte colPins[COLS] = { 22, 24, 26, 28 };
 Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
 // --- end of Keypad code ---
 
+// Network protocol definition
 void busReceiver(char cmd, uint8_t length, const TCommand *payload) {
   switch (cmd) {
     case cmdStatus: {
@@ -151,11 +152,11 @@ void setup() {
 
 }
 
-void displayInitialScreen() {                      // displays "Wait Calibrating at start. To be linked to Motors "L" and "C" calibration process
+void displayInitialScreen() {                 // displays static screen chars
   // Displays SWR
   tft.setTextColor(TFT_GREEN);
-  tft.setTextSize(1);                         // set the font size 2
-  tft.drawString("SWR", 10, 10, 2);             // write the text to coordinates
+  tft.setTextSize(1);                         // set the font x1
+  tft.drawString("SWR", 10, 10, 2);           // write the text to coordinates 10 = from left, 10 = from top. 2 = text zise
   // Displays L
   tft.setTextColor(TFT_GREEN);
   tft.setTextSize(1);
@@ -182,41 +183,41 @@ void displayInitialScreen() {                      // displays "Wait Calibrating
   tft.drawString("pF", 117, 112, 2);
   
 
-  keypad.addEventListener(keypadEvent);             //add an event listener for this keypad
+  keypad.addEventListener(keypadEvent);                         //add an event listener for this keypad
 }
 
 
-void incL(float diff) {                             // rotate motor L with number of steps
+void incL(float diff) {                                         // rotate motor L with number of steps
   mechSetPosition(round (diff), 0, 0);
 }
 
-void incC1(float diff) {                            // rotate motor C1 Cold with number of steps
+void incC1(float diff) {                                        // rotate motor C1 Cold with number of steps
   mechSetPosition(0, round(diff), 0);
 }
 
-void incC2(float diff) {                            // rotate motor C2 Hot with number of steps
+void incC2(float diff) {                                        // rotate motor C2 Hot with number of steps
   mechSetPosition(0, 0, round(diff));
 }
 
-void displaySWRvalue() {                                    // process to display SWR values
+void displaySWRvalue() {                                        // process to display/erase SWR values
   EraseDisplaySWR();
   displaySWR();
 }
 
-void displaySWR() {                                         // display SWR values
+void displaySWR() {                                             // display SWR values
   dtostrf(valueSWR, 5, 2, DisplayValueSWR);
   tft.setTextColor(TFT_GREEN);
   tft.setTextSize(1);
   tft.drawString(DisplayValueSWR, 50, 5, 4);
 }
 
-void EraseDisplaySWR() {                                   // erase display SWR values
+void EraseDisplaySWR() {                                        // erase display SWR values
   tft.setTextColor(TFT_BLACK);
   tft.setTextSize(1);
   tft.drawString(DisplayValueSWR, 50, 5, 4);
 }
 
-double stepsToUH(double x) {
+double stepsToUH(double x) {                                    // L convertion from steps to uH values polynome
    return  3.2984940709870936e-001 * pow(x,0)
         +  2.5621377247607574e-005 * pow(x,1)
         +  7.3269703268229895e-009 * pow(x,2)
@@ -273,7 +274,7 @@ void EraseDisplayL() {                                        // erase L steps a
   ErasDisplayValueLuH();
 }
 
-double stepsC1topF(double x) {
+double stepsC1topF(double x) {                                  // C1 convertion from steps to pF values polynome
   return  3.5215908593183684e+002 * pow(x, 0)
           + -1.6245967367326516e-001 * pow(x, 1)
           + -8.9757122524750620e-004 * pow(x, 2)
@@ -297,13 +298,13 @@ void displayValueC1pF() {                                         // display C1 
   tft.drawString(DisplayValueC1pF, 50, 75, 4);
 }
 
-void ErasDisplayValueC1pF() {                                   // erase display C1 values in pF
+void ErasDisplayValueC1pF() {                                     // erase display C1 values in pF
   tft.setTextColor(TFT_BLACK);
   tft.setTextSize(1);
   tft.drawString(DisplayValueC1pF, 50, 75, 4);
 }
 
-void displayC1steps() {                                       // display C1 steps values
+void displayC1steps() {                                            // display C1 steps values
   dtostrf(valueRotateC1, 5, 0, DisplayValueC1);
   if (isBusy) {
     tft.setTextColor(TFT_YELLOW);
@@ -314,23 +315,23 @@ void displayC1steps() {                                       // display C1 step
   tft.drawString(DisplayValueC1, 0, 83, 2);
 }
 
-void EraseDisplayC1steps() {                                   // erase display C1 steps values
+void EraseDisplayC1steps() {                                        // erase display C1 steps values
   tft.setTextColor(TFT_BLACK);
   tft.setTextSize(1);
   tft.drawString(DisplayValueC1, 0, 83, 2);
 }
 
-void displayC1() {                                             // display C1 values
+void displayC1() {                                                  // display C1 values
   displayC1steps();
   displayValueC1pF();
 }
 
-void EraseDisplayC1() {                                        // erase C1 values
+void EraseDisplayC1() {                                             // erase C1 values
   EraseDisplayC1steps();
   ErasDisplayValueC1pF();
 }
 
-double stepsC2topF(double x) {
+double stepsC2topF(double x) {                                      // C2 convertion from steps to pF values polynome
   return  3.5215908593183684e+002 * pow(x, 0)
           + -1.6245967367326516e-001 * pow(x, 1)
           + -8.9757122524750620e-004 * pow(x, 2)
@@ -343,7 +344,7 @@ double stepsC2topF(double x) {
           +  1.0154127876671653e-024 * pow(x, 9);
 }
 
-void displayValueC2pF() {                                         // display C2 values in pF
+void displayValueC2pF() {                                           // display C2 values in pF
   dtostrf(stepsC2topF(valueRotateC2), 4, 1, DisplayValueC2pF);
   if (isBusy) {
     tft.setTextColor(TFT_YELLOW);
@@ -354,13 +355,13 @@ void displayValueC2pF() {                                         // display C2 
   tft.drawString(DisplayValueC2pF, 50, 107, 4);
 }
 
-void ErasDisplayValueC2pF() {                                   // erase display C1 values in pF
+void ErasDisplayValueC2pF() {                                       // erase display C1 values in pF
   tft.setTextColor(TFT_BLACK);
   tft.setTextSize(1);
   tft.drawString(DisplayValueC2pF, 50, 107, 4);
 }
 
-void displayC2steps() {                                       // display C2 steps values
+void displayC2steps() {                                             // display C2 steps values
   dtostrf(valueRotateC2, 5, 0, DisplayValueC2);
   if (isBusy) {
     tft.setTextColor(TFT_YELLOW);
@@ -371,23 +372,24 @@ void displayC2steps() {                                       // display C2 step
   tft.drawString(DisplayValueC2, 0, 115, 2);
 }
 
-void EraseDisplayC2steps() {                                   // erase display C2 steps values
+void EraseDisplayC2steps() {                                        // erase display C2 steps values
   tft.setTextColor(TFT_BLACK);
   tft.setTextSize(1);
   tft.drawString(DisplayValueC2, 0, 115, 2);
 }
 
-void displayC2() {                                             // display C1 values
+void displayC2() {                                                  // display C1 values
   displayC2steps();
   displayValueC2pF();
 }
 
-void EraseDisplayC2() {                                        // erase C1 values
+void EraseDisplayC2() {                                             // erase C1 values
   EraseDisplayC2steps();
   ErasDisplayValueC2pF();
 }
 
-void sendStatusRequest() {
+// network device status request procedure - returns Nano status
+void sendStatusRequest() {                                          
   static const unsigned long REFRESH_INTERVAL = 100; // ms
   static unsigned long lastRefreshTime = 0;
   if (millis() - lastRefreshTime >= REFRESH_INTERVAL)
@@ -404,34 +406,32 @@ void keypadEvent(KeypadEvent eKey) {
     case PRESSED:
       //    lcd.print(eKey);
       switch (eKey) {
-        //        case '#':                           // submit frequesncy
-        //          SetFrequency();
-        //         break;
-        case 'c':                           // "C1 Cold" motor move 5 step CCW
+      //        case '#':                   // not used atm
+      //         break;
+        case 'c':                           // "C1 Cold" motor move 1 step CCW
           incC1(-1);
           break;
-        case 'C':                           // "C1 Cold" motor move 5 step CW
+        case 'C':                           // "C1 Cold" motor move 1 step CW
           incC1(1);
           break;
-        case 'h':                           // "C2 Hot" motor move 5 step CCW
+        case 'h':                           // "C2 Hot" motor move 1 step CCW
           incC2(-1);
           break;
-        case 'H':                           // "C2 Hot" motor move 5 step CW
+        case 'H':                           // "C2 Hot" motor move 1 step CW
           incC2(1);
           break;
-        case 'D':                           // "L" motor move 100 step CCW
+        case 'D':                           // "L" motor move 10 step CCW
           incL(-10.0);
           break;
-        case 'U':                           // "L" motor move 100 step CW
+        case 'U':                           // "L" motor move 10 step CW
           incL(+10.0);
           break;
-        ///        case '*':                           // erase entered frequency
-        //          eraseFrequency();
+        ///        case '*':                // not used atm
         //          break;
-        case 'S':                           // erase entered frequency
+        case 'S':                           // Auto tune button
           mechAutoTune();
           break;
-        case 'K':                           // erase entered frequency
+        case 'K':                           // Fine tune button - in development, not sure if we need it
           mechFineTune();
           break;
       }
@@ -444,11 +444,11 @@ void loop() {
   busLoop();
   //sendStatusRequest();
 
-  key = keypad.getKey();
+  key = keypad.getKey();    
 
   if (key != NO_KEY && (key == '1' || key == '2' || key == '3' || key == '4' || key == '5' || key == '6' || key == '7' || key == '8' || key == '9' || key == '0'))
   {
-    //                                               entering required frequency at screen bottom
+    // keypad capture, not used atm
     if (presentValue != true) {
       /*
         EnteredFreqString = EnteredFreqString + key;
@@ -460,6 +460,7 @@ void loop() {
       */
     }
   }
+    // display refresh settings - refresh values on display only when they changed
   if (displayRefreshFlags != 0) {
 
     if ((displayRefreshFlags & DISPLAY_REFRESH_SWR) != 0) {
@@ -489,9 +490,6 @@ void loop() {
         tft.setTextColor(TFT_BLACK);
         digitalWrite(40, HIGH);
       }
-//      tft.setTextSize(1);
-//      tft.drawString("Ready", 50, 115, 1);                // write the text to coordinates
-//      displayRefreshFlags &= ~DISPLAY_REFRESH_BSY;
     }
   }
 }
