@@ -162,6 +162,14 @@ void optimize(AccelStepper *chanel, int16_t step, int16_t hysteresis) {
   yeld();
   uint16_t prevSetepPwr = rflPwrPercent;
   while (step != 0) {
+    if ((fwdPwrVal >> 4) == 0) {
+      dprintf("optimize() - aborting due power conditions.\n");
+      break;
+    }
+     if ((rflPwrVal >> 4) == 0) {
+      dprintf("optimize() - aborting due rflPwrVal precision.\n");
+      break;
+    }	  	  
     chanel->move(step);
     yeld();
     if (prevSetepPwr < (rflPwrPercent + hysteresis)) {
@@ -173,10 +181,6 @@ void optimize(AccelStepper *chanel, int16_t step, int16_t hysteresis) {
       }
     }
     prevSetepPwr = rflPwrPercent;
-    if (((fwdPwrVal >> 4) == 0) || ((rflPwrVal >> 4) == 0)) {
-      dprintf("optimize() - aborting due power conditions\n");
-      break;
-    }
     stepCount++;
   }
   dprintf("optimize() - finished in %d step(s)\n", stepCount);
