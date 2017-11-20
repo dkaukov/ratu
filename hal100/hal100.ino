@@ -491,6 +491,7 @@ void loop() {
         tft.setTextColor(TFT_BLACK);
         digitalWrite(40, HIGH);
       }
+      displayRefreshFlags &= ~DISPLAY_REFRESH_BSY;
     }
   }
 }
