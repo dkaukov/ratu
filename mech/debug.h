@@ -25,13 +25,12 @@ uint8_t __dbg_buff_ptr = 0;
 static FILE debugout = {0};
 
 static int debug_putchar (char c, FILE *stream) {
-  if (__dbg_buff_ptr < BUFF_SIZE) {
-    __dbg_buff[__dbg_buff_ptr] = c;
-    __dbg_buff_ptr++;
-  } else {
+  if (__dbg_buff_ptr >= BUFF_SIZE) {
     icsc.send(ID_HAL100, (char) cmdDebug, __dbg_buff_ptr, &__dbg_buff[0]);
     __dbg_buff_ptr = 0;
   }
+  __dbg_buff[__dbg_buff_ptr] = c;
+  __dbg_buff_ptr++;
   return 1;
 }
 
