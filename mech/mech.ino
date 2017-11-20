@@ -187,17 +187,17 @@ void autoTune() {
     dprintf("autoTune() - rejected\n");
     return;
   }
-  unsigned long startedTime = micros();
+  uint16_t startedTime = micros();
   dprintf("autoTune() - started\n");
   isAutoTune = 1;
   stepperC1.moveTo(10);
   stepperC2.moveTo(10);
   optimize(&stepperL, 2000, 0);
-  dprintf("autoTune() - stepperL finished in %8d uSec\n", micros() - startedTime);
+  dprintf("autoTune() - stepperL finished in %8d ms\n", (uint16_t) micros() - startedTime);
   optimize(&stepperC1, 20, 0);
-  dprintf("autoTune() - stepperC1 finished in %8d uSec\n", micros() - startedTime);
+  dprintf("autoTune() - stepperC1 finished in %8d ms\n", (uint16_t) micros() - startedTime);
   optimize(&stepperC2, 20, 0);
-  dprintf("autoTune() - stepperC2 finished in %8d uSec\n", micros() - startedTime);
+  dprintf("autoTune() - stepperC2 finished in %8d ms\n", (uint16_t) micros() - startedTime);
   isAutoTune = 0;
 }
 
