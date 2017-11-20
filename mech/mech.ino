@@ -161,6 +161,7 @@ void optimize(AccelStepper *chanel, int16_t step, int16_t hysteresis) {
   uint8_t stepCount = 0;
   yeld();
   uint16_t prevSetepPwr = rflPwrPercent;
+  dprintf("optimize() - initial rflPwrPercent = %d\n", rflPwrPercent);		
   while (step != 0) {
     if ((fwdPwrVal >> 4) == 0) {
       dprintf("optimize() - aborting due power conditions.\n");
@@ -183,7 +184,7 @@ void optimize(AccelStepper *chanel, int16_t step, int16_t hysteresis) {
     prevSetepPwr = rflPwrPercent;
     stepCount++;
   }
-  dprintf("optimize() - finished in %d step(s)\n", stepCount);
+  dprintf("optimize() - finished in %d step(s), rflPwrPercent = %d\n", stepCount, rflPwrPercent);
 }
 
 void autoTune() {
