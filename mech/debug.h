@@ -29,7 +29,7 @@ static int debug_putchar (char c, FILE *stream) {
     __dbg_buff[__dbg_buff_ptr] = c;
     __dbg_buff_ptr++;
   } else {
-    icsc.send(ID_HAL100, (char) cmdDebug, __dbg_buff_ptr, __dbg_buff);
+    icsc.send(ID_HAL100, (char) cmdDebug, __dbg_buff_ptr, (char *)&__dbg_buff);
     __dbg_buff_ptr = 0;
   }
   return 1;
@@ -43,7 +43,7 @@ inline void debugInit() {
 
 inline void debugLoop() {
   if (__dbg_buff_ptr > 0) {
-    icsc.send(ID_HAL100, (char) cmdDebug, __dbg_buff_ptr, __dbg_buff);
+    icsc.send(ID_HAL100, (char) cmdDebug, __dbg_buff_ptr, (char *)&__dbg_buff);
     __dbg_buff_ptr = 0;
   }
 }
