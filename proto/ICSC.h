@@ -96,7 +96,7 @@ typedef void (* callbackFunction)(
   uint8_t sender,
   char cmd,
   uint8_t len,
-  uint8_t *payload
+  char *payload
 );
 
 // Structure to store command code / function pairs
