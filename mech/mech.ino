@@ -148,12 +148,14 @@ void yeld() {
       stepperL.run();
       stepperC1.run();
       stepperC2.run();
+      debugLoop();
   }
   adcCnt = 0;
   while (adcCnt < adcLpfRaiseCnt()) {
     busLoop();
     adcLoop();
     sendStatusUpdates();
+    debugLoop();
   }
 }
 

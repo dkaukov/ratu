@@ -40,7 +40,7 @@ inline void debugInit() {
   stderr = &debugout;
 }
 
-inline void debugLoop() {
+void debugLoop() {
   if (__dbg_buff_ptr > 0) {
     icsc.send(ID_HAL100, (char) cmdDebug, __dbg_buff_ptr, &__dbg_buff[0]);
     __dbg_buff_ptr = 0;
