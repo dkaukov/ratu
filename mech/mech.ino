@@ -211,13 +211,26 @@ void autoTune() {
 
 void fineTune() {
   if (((fwdPwrVal >> 4) == 0) || (isAutoTune)) {
-    return;
-  }
-  isAutoTune = 1;
-  optimize(&stepperC1, 10, 0);
-  optimize(&stepperC2, 10, 0);
-  optimize(&stepperC1, 10, 0);
-  isAutoTune = 0;
+      dprintf("fineTune() - rejected\n");
+      return;
+    }
+    uint32_t startedTime = micros();
+    dprintf("fineTune() - started\n");
+    isAutoTune = 1;
+    stepperL.moveTo(3000);
+    stepperC1.moveTo(800);
+    stepperC2.moveTo(100);
+    optimize(&stepperC1, 20, 0);
+    dprintf("fineTune() - stepperC1 finished in %8d ms\n", (uint32_t) micros() - startedTime);
+    optimize(&stepperC2, 20, 0);
+    dprintf("fineTune() - stepperC2 finished in %8d ms\n", (uint32_t) micros() - startedTime);
+    optimize(&stepperL, 2000, 0);
+    dprintf("fineTune() - stepperL finished in %8d ms\n", (uint32_t) micros() - startedTime);
+    optimize(&stepperC1, 10, 0);
+    dprintf("fineTune() - stepperC1 finished in %8d ms\n", (uint32_t) micros() - startedTime);
+    optimize(&stepperC2, 10, 0);
+    dprintf("fineTune() - stepperC2 finished in %8d ms\n", (uint32_t) micros() - startedTime);
+    isAutoTune = 0;
 }
 
 void updateStatus() {
