@@ -15,7 +15,7 @@
 #define __ASSERT_USE_STDERR
 #include <assert.h>
 
-#define BUFF_SIZE 250
+#define BUFF_SIZE MAX_MESSAGE
 char __dbg_buff[BUFF_SIZE];
 uint8_t __dbg_buff_ptr = 0;
 
