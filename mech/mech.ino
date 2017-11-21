@@ -173,6 +173,7 @@ void optimize(AccelStepper *chanel, int16_t step, int16_t hysteresis) {
     }	  	  
     chanel->move(step);
     yeld();
+    dprintf("optimize() - [%d]: step=%d, P(n-1)=%d, P(n)=%d\n", stepCount, step, prevSetepPwr, rflPwrPercent);	  
     if (prevSetepPwr < (rflPwrPercent + hysteresis)) {
       step = -step;
       if (stepCount != 0) {
@@ -184,7 +185,7 @@ void optimize(AccelStepper *chanel, int16_t step, int16_t hysteresis) {
     prevSetepPwr = rflPwrPercent;
     stepCount++;
   }
-  dprintf("optimize() - finished in %d step(s), rflPwrPercent = %d\n", stepCount, rflPwrPercent);
+  dprintf("optimize() - finished in %d step(s), P(n)=%d\n", stepCount, rflPwrPercent);
 }
 
 void autoTune() {
